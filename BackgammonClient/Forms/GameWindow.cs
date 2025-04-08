@@ -34,6 +34,9 @@ namespace BackgammonClient.Forms
         private Disc selectedDisc;
         private int selectedDiscId;
 
+        int usedCubesAmount = 0;
+        private int movesRemaining = 0;
+
         private int[] Blackdiscs = new int[15];
 
         private Slot[] slots = new Slot[24];
@@ -59,10 +62,13 @@ namespace BackgammonClient.Forms
 
         public void switchTurn(bool turn)
         {
-          
             this.Invoke(new delSwitchTurn(initalTurn), turn);
         }
 
+        public bool isDone()
+        {
+            return false;
+        }
         public void updateBoard(string state)
         {
             this.Invoke(new delUpdateBoard(stateChanged), state);
@@ -126,7 +132,7 @@ namespace BackgammonClient.Forms
         public void initialBoard()
         {
             for (int i = 0; i < discsButtons.Length; i++)
-                {
+            {
                 if (discsButtons[i] != null)
                 {
                     this.Controls.Remove(discsButtons[i]);
@@ -134,14 +140,14 @@ namespace BackgammonClient.Forms
                     discsButtons[i] = null;
                 }
             }
-        
+
         }
 
         public void stateChanged(string state)
         {
-            string [] slotsString = state.Split(';');
+            string[] slotsString = state.Split(';');
 
-            for (int i = 0; i<slotsString.Length; i++)
+            for (int i = 0; i < slotsString.Length; i++)
             {
                 string[] slot = slotsString[i].Split(':');
                 slots[i].setColor(Int32.Parse(slot[0]));
@@ -202,9 +208,9 @@ namespace BackgammonClient.Forms
 
         public void showAvailableSlots(object sender, EventArgs e)
         {
-           
+
             int selectedDiscId = int.Parse(((Button)sender).Name);
-         //   selectedDisc = discs[selectedDiscId];
+            //   selectedDisc = discs[selectedDiscId];
             Color selectedDiscColor = ((Button)sender).BackColor;
 
             int slot = discs[selectedDiscId].getSlotId();
@@ -213,10 +219,10 @@ namespace BackgammonClient.Forms
 
 
             bool useCube1 = usedCube != cube1;
-            bool useCube2 = usedCube != cube2; 
+            bool useCube2 = usedCube != cube2;
             if (selectedDiscColor == discsColor[1]) //black
             {
-                if (useCube1 && slot + cube1 < this.slotsButtons.Length) 
+                if (useCube1 && slot + cube1 < this.slotsButtons.Length)
                     slot1 = slot + cube1;
 
                 if (useCube2 && slot + cube2 < this.slotsButtons.Length)
@@ -227,7 +233,7 @@ namespace BackgammonClient.Forms
                 if (useCube1 && slot - cube1 >= 0)
                     slot1 = slot - cube1;
 
-                if (useCube2 && slot - cube2 >= 0) 
+                if (useCube2 && slot - cube2 >= 0)
                     slot2 = slot - cube2;
             }
 
@@ -238,6 +244,8 @@ namespace BackgammonClient.Forms
                 enableValidSlot(slot2);
 
             this.selectedSlot = slot;
+
+
 
         }
 
@@ -251,51 +259,8 @@ namespace BackgammonClient.Forms
 
         public void buildBoard()
         {
-            int x = 700;
-            int y = 10;
-            for (int i = 0; i < slotsButtons.Length / 2; i++)
-            {
-                this.slotsButtons[i] = new Button();
-
-                this.slotsButtons[i].Location = new System.Drawing.Point(x, y);
-                this.slotsButtons[i].Name = "slot," + (i);
-                this.slotsButtons[i].Size = new System.Drawing.Size(50, 150);
-                this.slotsButtons[i].TabIndex = 36;
-                this.slotsButtons[i].TabStop = false;
-                this.slotsButtons[i].Enabled = false;
-                this.slotsButtons[i].Click += new System.EventHandler(this.SlotClick);
-                this.Controls.Add(this.slotsButtons[i]);
-                this.slotsButtons[i].SendToBack();
-
-                if ((i + 1) % (slotsButtons.Length / 4) == 0 && i != 0 && i != slotsButtons.Length / 2 - 1)
-                {
-                    x -= 50;
-                }
-                x -= 50;
-            }
-            y = 285;
-            x += 50;
-            for (int i = slotsButtons.GetLength(0) / 2; i < slotsButtons.Length; i++)
-            {
-                this.slotsButtons[i] = new Button();
-
-                this.slotsButtons[i].Location = new System.Drawing.Point(x, y);
-                this.slotsButtons[i].Name = "slot," + (i);
-                this.slotsButtons[i].Size = new System.Drawing.Size(50, 153);
-                this.slotsButtons[i].TabIndex = 36;
-                this.slotsButtons[i].TabStop = false;
-                this.slotsButtons[i].Click += new System.EventHandler(this.SlotClick);
-                this.Controls.Add(this.slotsButtons[i]);
-                this.slotsButtons[i].SendToBack();
-
-                if ((i + 1) % (slotsButtons.Length / 4) == 0 && i != 0)
-                {
-                    x += 50;
-                }
-
-                x += 50;
-            }
-            x = 50;
+            placeSlotsTop();
+            placeSlotsBottom();
         }
 
         public void SlotClick(object sender, EventArgs e)
@@ -305,12 +270,25 @@ namespace BackgammonClient.Forms
             slots[selectedSlot].setQuantity(slots[selectedSlot].getQuantity() - 1);
             slots[selectedSlotId].setQuantity(slots[selectedSlotId].getQuantity() + 1);
             slots[selectedSlotId].setColor(this.color);
-            
+
             int diff = Math.Abs(selectedSlotId - selectedSlot);
 
             if (diff == cube1 || diff == cube2)
             {
                 usedCube = diff;
+            }
+
+            usedCubesAmount++;
+            movesRemaining--;
+            // if (usedCubesAmount >= 2 || (cube1 == 0 && cube2 == 0))
+
+            // Reset selection
+            selectedDisc = null;
+            usedCube = 0;
+
+            if (movesRemaining <= 0)
+            {
+                this.OnSwitchTurn?.Invoke();
             }
             disableUsedCube();
             sendState();
@@ -351,7 +329,7 @@ namespace BackgammonClient.Forms
         public void sendState()
         {
             string[] slotsString = new string[slots.Length];
-            for (int i=0; i < slots.Length; i++)
+            for (int i = 0; i < slots.Length; i++)
             {
                 slotsString[i] = slots[i].toString();
             }
@@ -359,105 +337,180 @@ namespace BackgammonClient.Forms
         }
 
 
-        private void GameWindow_Load(object sender, EventArgs e)
-        {
-
-        }
-
+        
         private void rollTheDice_click(object sender, EventArgs e)
         {
             Random rnd = new Random();
             cube1 = rnd.Next(1, 7);
             cube2 = rnd.Next(1, 7);
 
-            switch (cube1)
+            if (cube1 == cube2)
             {
-                case 1:
-                    {
-                        pictureBox1.Image = Image.FromFile(@"../../../cubeImages/one.png");
-                        break;
-                    }
-
-                case 2:
-                    {
-                        pictureBox1.Image = Image.FromFile(@"../../../cubeImages/two.jpg");
-                        break;
-                    }
-
-                case 3:
-                    {
-                        pictureBox1.Image = Image.FromFile(@"../../../cubeImages/three.jpg");
-                        break;
-                    }
-
-                case 4:
-                    {
-                        pictureBox1.Image = Image.FromFile(@"../../../cubeImages/four.jpg");
-                        break;
-                    }
-
-                case 5:
-                    {
-                        pictureBox1.Image = Image.FromFile(@"../../../cubeImages/five.jpg");
-                        break;
-                    }
-
-                case 6:
-                    {
-                        pictureBox1.Image = Image.FromFile(@"../../../cubeImages/six.jpg");
-                        break;
-                    }
+                movesRemaining = 4;
             }
-            switch (cube2)
+            else
             {
-                case 1:
-                    {
-                        pictureBox2.Image = Image.FromFile(@"../../../cubeImages/one.png");
-                        break;
-                    }
-
-                case 2:
-                    {
-                        pictureBox2.Image = Image.FromFile(@"../../../cubeImages/two.jpg");
-                        break;
-                    }
-
-                case 3:
-                    {
-                        pictureBox2.Image = Image.FromFile(@"../../../cubeImages/three.jpg");
-                        break;
-                    }
-
-                case 4:
-                    {
-                        pictureBox2.Image = Image.FromFile(@"../../../cubeImages/four.jpg");
-                        break;
-                    }
-
-                case 5:
-                    {
-                        pictureBox2.Image = Image.FromFile(@"../../../cubeImages/five.jpg");
-                        break;
-                    }
-
-                case 6:
-                    {
-                        pictureBox2.Image = Image.FromFile(@"../../../cubeImages/six.jpg");
-                        break;
-                    }
-                    //pictureBox1.Image = Image.FromFile(Environment.CurrentDirectory + "Resources/" +cube1.ToString()+".jpg");
-                    //pictureBox2.Image = Image.FromFile(Environment.CurrentDirectory + "Resources/" + cube2.ToString() + ".jpg");
+                movesRemaining = 2;
             }
+            setCubePicture(cube1, 1);
+            setCubePicture(cube2, 2);
+            
             this.roll.Enabled = false;
 
         }
-    
+
 
         private void doneButton_Click(object sender, EventArgs e)
         {
             this.OnSwitchTurn?.Invoke();
         }
 
-        
+        private void GameWindow_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        public void placeSlotsTop()
+        {
+            int x = 700;
+            int y = 10;
+            for (int i = 0; i < slotsButtons.Length / 2; i++)
+            {
+                this.slotsButtons[i] = new Button();
+
+                this.slotsButtons[i].Location = new System.Drawing.Point(x, y);
+                this.slotsButtons[i].Name = "slot," + (i);
+                this.slotsButtons[i].Size = new System.Drawing.Size(50, 150);
+                this.slotsButtons[i].TabIndex = 36;
+                this.slotsButtons[i].TabStop = false;
+                this.slotsButtons[i].Enabled = false;
+                this.slotsButtons[i].Click += new System.EventHandler(this.SlotClick);
+                this.Controls.Add(this.slotsButtons[i]);
+                this.slotsButtons[i].SendToBack();
+
+                if ((i + 1) % (slotsButtons.Length / 4) == 0 && i != 0 && i != slotsButtons.Length / 2 - 1)
+                {
+                    x -= 50;
+                }
+                x -= 50;
+            }
+        }
+
+        public void placeSlotsBottom()
+        {
+            int y = 285;
+            int x = 50;
+            for (int i = slotsButtons.GetLength(0) / 2; i < slotsButtons.Length; i++)
+            {
+                this.slotsButtons[i] = new Button();
+
+                this.slotsButtons[i].Location = new System.Drawing.Point(x, y);
+                this.slotsButtons[i].Name = "slot," + (i);
+                this.slotsButtons[i].Size = new System.Drawing.Size(50, 153);
+                this.slotsButtons[i].TabIndex = 36;
+                this.slotsButtons[i].TabStop = false;
+                this.slotsButtons[i].Click += new System.EventHandler(this.SlotClick);
+                this.Controls.Add(this.slotsButtons[i]);
+                this.slotsButtons[i].SendToBack();
+
+                if ((i + 1) % (slotsButtons.Length / 4) == 0 && i != 0)
+                {
+                    x += 50;
+                }
+
+                x += 50;
+            }
+            x = 50;
+        }
+
+        public void setCubePicture(int cube, int cubeNum)
+        {
+
+            if (cubeNum == 1)
+            {
+                switch (cube)
+                {
+                    case 1:
+                        {
+                            pictureBox1.Image = Image.FromFile(@"../../../cubeImages/one.png");
+                            break;
+                        }
+
+                    case 2:
+                        {
+                            pictureBox1.Image = Image.FromFile(@"../../../cubeImages/two.jpg");
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            pictureBox1.Image = Image.FromFile(@"../../../cubeImages/three.jpg");
+                            break;
+                        }
+
+                    case 4:
+                        {
+                            pictureBox1.Image = Image.FromFile(@"../../../cubeImages/four.jpg");
+                            break;
+                        }
+
+                    case 5:
+                        {
+                            pictureBox1.Image = Image.FromFile(@"../../../cubeImages/five.jpg");
+                            break;
+                        }
+
+                    case 6:
+                        {
+                            pictureBox1.Image = Image.FromFile(@"../../../cubeImages/six.jpg");
+                            break;
+                        }
+                }
+            }
+
+            else if (cubeNum == 2)
+            {
+                switch (cube)
+                {
+                    case 1:
+                        {
+                            pictureBox2.Image = Image.FromFile(@"../../../cubeImages/one.png");
+                            break;
+                        }
+
+                    case 2:
+                        {
+                            pictureBox2.Image = Image.FromFile(@"../../../cubeImages/two.jpg");
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            pictureBox2.Image = Image.FromFile(@"../../../cubeImages/three.jpg");
+                            break;
+                        }
+
+                    case 4:
+                        {
+                            pictureBox2.Image = Image.FromFile(@"../../../cubeImages/four.jpg");
+                            break;
+                        }
+
+                    case 5:
+                        {
+                            pictureBox2.Image = Image.FromFile(@"../../../cubeImages/five.jpg");
+                            break;
+                        }
+
+                    case 6:
+                        {
+                            pictureBox2.Image = Image.FromFile(@"../../../cubeImages/six.jpg");
+                            break;
+                        }
+                        //pictureBox1.Image = Image.FromFile(Environment.CurrentDirectory + "Resources/" +cube1.ToString()+".jpg");
+                        //pictureBox2.Image = Image.FromFile(Environment.CurrentDirectory + "Resources/" + cube2.ToString() + ".jpg");
+                }
+            }
+        }
     }
 }

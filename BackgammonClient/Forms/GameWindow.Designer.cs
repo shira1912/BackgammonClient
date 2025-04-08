@@ -68,7 +68,7 @@
             // turnLabel
             // 
             turnLabel.AutoSize = true;
-            turnLabel.Location = new System.Drawing.Point(30, 319);
+            turnLabel.Location = new System.Drawing.Point(15, 319);
             turnLabel.Name = "turnLabel";
             turnLabel.Size = new System.Drawing.Size(0, 15);
             turnLabel.TabIndex = 3;

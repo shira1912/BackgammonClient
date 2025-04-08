@@ -10,13 +10,16 @@ namespace BackgammonClient
         private LogInWindow _logInWindow;
         private WaitingRoomWindow _waitingRoomWindow;
         public event Action<string> OnLogIn;
+        public event Action<string> OnCaptcha;
         public event Action OnSwitchWindowToSignUp;
+        private CaptchaCard captchaCard;
 
         public LogInWindow()
         {
             InitializeComponent();
-
+            captchaCard = new CaptchaCard();
             _waitingRoomWindow = new WaitingRoomWindow();
+            captchaCard.Location = new System.Drawing.Point(0,0);
         }
 
         public void ShowMessageInMessageBox(string message)
@@ -54,6 +57,16 @@ namespace BackgammonClient
         private void SkipButton_Click(object sender, EventArgs e)
         {
             OnLogIn?.Invoke("Login,alex1989,StrongP@ssw0rd");
+        }
+
+        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox.Checked)
+            {
+                Controls.Add(captchaCard);
+                checkBox.Enabled = false;
+            }
+
         }
     }
 }

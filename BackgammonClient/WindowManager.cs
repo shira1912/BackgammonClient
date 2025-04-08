@@ -15,6 +15,8 @@ namespace BackgammonClient
         private WaitingRoomWindow _waitingRoomWindow;
         private GameWindow _GameWindow;
         private int playerId;
+        private delegate void delWaitingLabel();
+
 
         public WindowManager()
         {
@@ -30,6 +32,7 @@ namespace BackgammonClient
             _logInWindow.OnLogIn += sendMessage;
             _logInWindow.OnSwitchWindowToSignUp += OnSwitchWindowToSignUp;
 
+
             _signUpWindow.OnSignUp += signUp;
             _signUpWindow.OnSwitchWindowToLogIn += OnSwitchWindowToLogIn;
 
@@ -43,6 +46,7 @@ namespace BackgammonClient
             _encryptedCommunication.SendMessage(message);
         }
 
+       
         private void SearchForGame()
         {
             _encryptedCommunication.SendMessage("InSearchForGame,");
@@ -68,6 +72,8 @@ namespace BackgammonClient
             _signUpWindow?.Hide();
             _logInWindow?.Show();
         }
+
+       
 
         private void OnMessageReceive(string message)
         {
@@ -95,12 +101,12 @@ namespace BackgammonClient
                     {
                         if (splitMessage[1] == "true")
                         {
-                            _logInWindow.BeginInvoke(() => 
+                            _logInWindow.BeginInvoke(() =>
                             {
                                 _waitingRoomWindow.Show();
                                 _logInWindow.Hide();
                             });
-                            
+                       
                         }
                         else
                         {
@@ -108,6 +114,8 @@ namespace BackgammonClient
                         }
                         break;
                     }
+
+                
                 case "StartGame":
                     {
                         _waitingRoomWindow.BeginInvoke(() =>
@@ -130,9 +138,10 @@ namespace BackgammonClient
                     }
                 case "Wait":
                     {
-                        _waitingRoomWindow.ShowMessageInMessageBox("Waiting for another player");
-
-                        break;
+                        //     _waitingRoomWindow.ShowMessageInMessageBox("Waiting for another player");
+                        _waitingRoomWindow.BeginInvoke(new Action(() => _waitingRoomWindow.changeWaitingLabel()));
+                        
+                            break;
                     }
                 case "Turn":
                     {

@@ -35,6 +35,7 @@
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             SkipButton = new System.Windows.Forms.Button();
+            checkBox = new System.Windows.Forms.CheckBox();
             SuspendLayout();
             // 
             // UserNameTextBox
@@ -100,11 +101,23 @@
             SkipButton.UseVisualStyleBackColor = false;
             SkipButton.Click += SkipButton_Click;
             // 
+            // checkBox
+            // 
+            checkBox.AutoSize = true;
+            checkBox.Location = new System.Drawing.Point(196, 283);
+            checkBox.Name = "checkBox";
+            checkBox.Size = new System.Drawing.Size(105, 19);
+            checkBox.TabIndex = 7;
+            checkBox.Text = "I'm not a robot";
+            checkBox.UseVisualStyleBackColor = true;
+            checkBox.CheckedChanged += checkBox_CheckedChanged;
+            // 
             // LogInWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(700, 422);
+            Controls.Add(checkBox);
             Controls.Add(SkipButton);
             Controls.Add(label1);
             Controls.Add(label2);
@@ -128,6 +141,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button SkipButton;
+        private System.Windows.Forms.CheckBox checkBox;
     }
 }
 
