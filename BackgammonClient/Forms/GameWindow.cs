@@ -27,7 +27,7 @@ namespace BackgammonClient.Forms
         private Button[] slotsButtons = new Button[24];
 
         private int[] WhitediscsPlaces = new int[15];
-        private Button[] discsButtons = new Button[24];
+        private Button[] discsButtons = new Button[30];
 
         private Disc[] discs = new Disc[30];
         //private int slotOfDiscId;
@@ -166,49 +166,51 @@ namespace BackgammonClient.Forms
             {
                 for (int j = 0; j < slots[i].getQuantity(); j++)
                 {
-                    // Create a new button for each disc
-                    Button discButton = new Button();
+                    // Make sure we don't exceed the array bounds
+                    if (counter >= discsButtons.Length)
+                    {
+                        Console.WriteLine($"Warning: Exceeded discsButtons array size at slot {i}, disc {j}");
+                        continue;
+                    }
+
+                    this.discsButtons[counter] = new Button(); // Use counter instead of i
 
                     Point location = this.slotsButtons[i].Location;
                     if (i > (slots.Length / 2) - 1)
                     {
-                        discButton.Location = new System.Drawing.Point(location.X + 10, location.Y - (j * 30) + 120);
+                        this.discsButtons[counter].Location = new System.Drawing.Point(location.X + 10, location.Y - (j * 30) + 120);
                     }
                     else
                     {
-                        discButton.Location = new System.Drawing.Point(location.X + 10, location.Y + (j * 30));
+                        this.discsButtons[counter].Location = new System.Drawing.Point(location.X + 10, location.Y + (j * 30));
                     }
 
                     if (slots[i].getColor() == 1)
                     {
-                        discButton.BackColor = discsColor[0]; //white
+                        this.discsButtons[counter].BackColor = discsColor[0]; // white
+                        this.discsButtons[counter].Name = counter.ToString();
                     }
                     else
                     {
-                        discButton.BackColor = discsColor[1]; //black
+                        this.discsButtons[counter].BackColor = discsColor[1]; // black
+                        this.discsButtons[counter].Name = counter.ToString();
                     }
 
-                    // Store the counter (unique disc ID) and slot information
-                    discButton.Name = counter.ToString();
-                    discButton.Size = new System.Drawing.Size(30, 30);
-                    discButton.TabIndex = 36;
-                    discButton.TabStop = false;
-                    discButton.Click += new System.EventHandler(this.showAvailableSlots);
+                    this.discsButtons[counter].Size = new System.Drawing.Size(30, 30);
+                    this.discsButtons[counter].TabIndex = 36;
+                    this.discsButtons[counter].TabStop = false;
+                    this.discsButtons[counter].Enabled = (this.discsButtons[counter].BackColor == discsColor[this.color-1]);
+                    this.discsButtons[counter].Click += new System.EventHandler(this.showAvailableSlots);
 
-                    // Store the button in the array
-                    if (counter < discsButtons.Length)
-                    {
-                        this.discsButtons[counter] = discButton;
-                    }
-
-                    this.Controls.Add(discButton);
-                    discButton.BringToFront();
+                    this.Controls.Add(this.discsButtons[counter]);
+                    this.discsButtons[counter].BringToFront();
 
                     this.discs[counter] = new Disc(i);
                     counter++;
                 }
             }
         }
+        
 
         public void showAvailableSlots(object sender, EventArgs e)
         {
@@ -242,6 +244,7 @@ namespace BackgammonClient.Forms
 
 
         }
+        
 
         public void enableValidSlot(int slotId)
         {
@@ -270,7 +273,14 @@ namespace BackgammonClient.Forms
         {
             string[] selectedSlotName = ((Button)sender).Name.Split(',');
             int selectedSlotId = int.Parse(selectedSlotName[1]);
-            slots[selectedSlot].setQuantity(slots[selectedSlot].getQuantity() - 1);
+
+            // Make sure we properly decrement the quantity at the starting slot
+            if (slots[selectedSlot].getQuantity() > 0)
+            {
+                slots[selectedSlot].setQuantity(slots[selectedSlot].getQuantity() - 1);
+            }
+
+            // Add disc to the target slot
             slots[selectedSlotId].setQuantity(slots[selectedSlotId].getQuantity() + 1);
             slots[selectedSlotId].setColor(this.color);
 
@@ -298,6 +308,10 @@ namespace BackgammonClient.Forms
             {
                 this.OnSwitchTurn?.Invoke();
             }
+
+            // Important: Redraw the board to reflect changes
+            placeDiscs();
+
             disableUsedCube();
             sendState();
         }
