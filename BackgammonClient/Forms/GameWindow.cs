@@ -113,20 +113,24 @@ namespace BackgammonClient.Forms
 
         public void disableButtons(bool turn)
         {
+            // Disable all slot buttons
             for (int i = 0; i < slots.Length; i++)
             {
                 this.slotsButtons[i].Enabled = false;
-
             }
 
+            // Enable/disable roll and done buttons based on turn
             roll.Enabled = turn;
             doneButton.Enabled = turn;
 
+            // Enable/disable disc buttons based on turn and color
             for (int i = 0; i < this.discsButtons.Length; i++)
             {
                 if (discsButtons[i] != null)
-                { 
-                    this.discsButtons[i].Enabled = turn;
+                {
+                    // Only enable discs of the player's color when it's their turn
+                    this.discsButtons[i].Enabled = turn &&
+                        (this.discsButtons[i].BackColor == discsColor[this.color - 1]);
                 }
             }
         }
@@ -199,7 +203,12 @@ namespace BackgammonClient.Forms
                     this.discsButtons[counter].Size = new System.Drawing.Size(30, 30);
                     this.discsButtons[counter].TabIndex = 36;
                     this.discsButtons[counter].TabStop = false;
-                    this.discsButtons[counter].Enabled = (this.discsButtons[counter].BackColor == discsColor[this.color-1]);
+
+                    // Check if it's the player's turn and if the disc color matches the player's color
+                    bool isTurn = this.turnLabel.Text == "It's your turn";
+                    this.discsButtons[counter].Enabled = isTurn &&
+                        (this.discsButtons[counter].BackColor == discsColor[this.color - 1]);
+
                     this.discsButtons[counter].Click += new System.EventHandler(this.showAvailableSlots);
 
                     this.Controls.Add(this.discsButtons[counter]);
