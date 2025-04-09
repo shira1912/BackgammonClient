@@ -53,11 +53,12 @@ namespace BackgammonClient.Forms
         public GameWindow(int color)
         {
             InitializeComponent();
+            this.color = color;
             buildBoard();
             initialSlots();
             placeDiscs();
-            this.color = color;
             initalTurn(color == 1);
+         //   this.colorPictureBox.BackColor = discsColor[1];
         }
 
         public void switchTurn(bool turn)
@@ -140,6 +141,7 @@ namespace BackgammonClient.Forms
                     discsButtons[i] = null;
                 }
             }
+
 
         }
 
@@ -261,6 +263,15 @@ namespace BackgammonClient.Forms
         {
             placeSlotsTop();
             placeSlotsBottom();
+            if (this.color == 1)
+            {
+                this.colorPictureBox.BackColor = discsColor[0];
+            }
+
+            else if (this.color == 2)
+            {
+                this.colorPictureBox.BackColor = discsColor[1];
+            }
         }
 
         public void SlotClick(object sender, EventArgs e)
@@ -337,7 +348,7 @@ namespace BackgammonClient.Forms
         }
 
 
-        
+
         private void rollTheDice_click(object sender, EventArgs e)
         {
             Random rnd = new Random();
@@ -354,7 +365,7 @@ namespace BackgammonClient.Forms
             }
             setCubePicture(cube1, 1);
             setCubePicture(cube2, 2);
-            
+
             this.roll.Enabled = false;
 
         }
@@ -399,7 +410,7 @@ namespace BackgammonClient.Forms
         public void placeSlotsBottom()
         {
             int y = 285;
-            int x = 50;
+            int x = 100;
             for (int i = slotsButtons.GetLength(0) / 2; i < slotsButtons.Length; i++)
             {
                 this.slotsButtons[i] = new Button();
@@ -511,6 +522,11 @@ namespace BackgammonClient.Forms
                         //pictureBox2.Image = Image.FromFile(Environment.CurrentDirectory + "Resources/" + cube2.ToString() + ".jpg");
                 }
             }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

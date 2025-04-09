@@ -33,8 +33,11 @@
             pictureBox2 = new System.Windows.Forms.PictureBox();
             turnLabel = new System.Windows.Forms.Label();
             doneButton = new System.Windows.Forms.Button();
+            colorPictureBox = new System.Windows.Forms.PictureBox();
+            youLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)colorPictureBox).BeginInit();
             SuspendLayout();
             // 
             // roll
@@ -83,11 +86,32 @@
             doneButton.UseVisualStyleBackColor = true;
             doneButton.Click += doneButton_Click;
             // 
+            // colorPictureBox
+            // 
+            colorPictureBox.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            colorPictureBox.Location = new System.Drawing.Point(17, 183);
+            colorPictureBox.Name = "colorPictureBox";
+            colorPictureBox.Size = new System.Drawing.Size(35, 31);
+            colorPictureBox.TabIndex = 5;
+            colorPictureBox.TabStop = false;
+            // 
+            // youLabel
+            // 
+            youLabel.AutoSize = true;
+            youLabel.Location = new System.Drawing.Point(18, 165);
+            youLabel.Name = "youLabel";
+            youLabel.Size = new System.Drawing.Size(30, 15);
+            youLabel.TabIndex = 6;
+            youLabel.Text = "you:";
+            youLabel.Click += label1_Click;
+            // 
             // GameWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(800, 450);
+            Controls.Add(youLabel);
+            Controls.Add(colorPictureBox);
             Controls.Add(doneButton);
             Controls.Add(turnLabel);
             Controls.Add(pictureBox2);
@@ -98,6 +122,7 @@
             Load += GameWindow_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)colorPictureBox).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -109,5 +134,7 @@
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label turnLabel;
         private System.Windows.Forms.Button doneButton;
+        private System.Windows.Forms.PictureBox colorPictureBox;
+        private System.Windows.Forms.Label youLabel;
     }
 }
