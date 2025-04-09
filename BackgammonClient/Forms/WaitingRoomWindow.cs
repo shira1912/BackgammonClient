@@ -27,7 +27,7 @@ namespace BackgammonClient.Forms
 
         public void changeWaitingLabel()
         {
-            this.waitingLabel.Text = "Waiting for another player";
+            this.waitingLabel.Text = "Waiting for another player...";
         }
 
         public void ShowMessageInMessageBox(string message)

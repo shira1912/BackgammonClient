@@ -59,13 +59,13 @@ namespace BackgammonClient.Forms
             buildBoard();
             initialSlots();
             placeDiscs();
-            initialTurn(color == 1);
-         //   this.colorPictureBox.BackColor = discsColor[1];
+            initalTurn(color == 1);
+         
         }
 
         public void switchTurn(bool turn)
         {
-            this.Invoke(new delSwitchTurn(initialTurn), turn);
+            this.Invoke(new delSwitchTurn(initalTurn), turn);
         }
 
         public bool isDone()
@@ -77,16 +77,16 @@ namespace BackgammonClient.Forms
             this.Invoke(new delUpdateBoard(stateChanged), state);
         }
 
-        public void initialTurn(bool turn)
+        public void initalTurn(bool turn)
         {
             disableButtons(turn);
             if (turn)
             {
-                this.turnLabel.Text = "It's your turn";
+                this.turnLabel.Text = "IT'S YOUR TURN";
             }
             else
             {
-                this.turnLabel.Text = "It's not your turn";
+                this.turnLabel.Text = "IT'S NOT YOUR TURN";
             }
         }
 
@@ -128,6 +128,7 @@ namespace BackgammonClient.Forms
                     // Only enable discs of the player's color when it's their turn
                     this.discsButtons[i].Enabled = turn &&
                         (this.discsButtons[i].BackColor == discsColor[this.color - 1]);
+   
                 }
             }
         }
@@ -202,7 +203,7 @@ namespace BackgammonClient.Forms
                     this.discsButtons[counter].TabStop = false;
 
                     // Check if it's the player's turn and if the disc color matches the player's color
-                    bool isTurn = this.turnLabel.Text == "It's your turn";
+                    bool isTurn = this.turnLabel.Text == "IT'S YOUR TURN";
                     this.discsButtons[counter].Enabled = isTurn &&
                         (this.discsButtons[counter].BackColor == discsColor[this.color - 1]);
 
@@ -232,6 +233,7 @@ namespace BackgammonClient.Forms
             for (int i = 0; i < slotsButtons.Length; i++)
             {
                 slotsButtons[i].Enabled = false;
+                this.slotsButtons[i].BackColor = System.Drawing.Color.Silver;
             }
 
             // Only show slots for unused dice
@@ -257,6 +259,8 @@ namespace BackgammonClient.Forms
             if (slots[slotId].getColor() == this.color || slots[slotId].getQuantity() <= 1)
             {
                 this.slotsButtons[slotId].Enabled = true;
+                this.slotsButtons[slotId].BackColor = System.Drawing.Color.Gainsboro;
+
             }
         }
 
@@ -328,6 +332,7 @@ namespace BackgammonClient.Forms
             for (int i = 0; i < slotsButtons.Length; i++)
             {
                 slotsButtons[i].Enabled = false;
+                this.slotsButtons[i].BackColor = System.Drawing.Color.Silver;
             }
 
             // If no dice are used yet or no disc is selected, exit
@@ -424,7 +429,7 @@ namespace BackgammonClient.Forms
 
         public void placeSlotsTop()
         {
-            int x = 700;
+            int x = 725;
             int y = 10;
             for (int i = 0; i < slotsButtons.Length / 2; i++)
             {
@@ -436,6 +441,7 @@ namespace BackgammonClient.Forms
                 this.slotsButtons[i].TabIndex = 36;
                 this.slotsButtons[i].TabStop = false;
                 this.slotsButtons[i].Enabled = false;
+                this.slotsButtons[i].BackColor = System.Drawing.Color.Silver;
                 this.slotsButtons[i].Click += new System.EventHandler(this.SlotClick);
                 this.Controls.Add(this.slotsButtons[i]);
                 this.slotsButtons[i].SendToBack();
@@ -451,7 +457,7 @@ namespace BackgammonClient.Forms
         public void placeSlotsBottom()
         {
             int y = 285;
-            int x = 100;
+            int x = 125;
             for (int i = slotsButtons.GetLength(0) / 2; i < slotsButtons.Length; i++)
             {
                 this.slotsButtons[i] = new Button();
@@ -461,6 +467,7 @@ namespace BackgammonClient.Forms
                 this.slotsButtons[i].Size = new System.Drawing.Size(50, 153);
                 this.slotsButtons[i].TabIndex = 36;
                 this.slotsButtons[i].TabStop = false;
+                this.slotsButtons[i].BackColor = System.Drawing.Color.Silver;
                 this.slotsButtons[i].Click += new System.EventHandler(this.SlotClick);
                 this.Controls.Add(this.slotsButtons[i]);
                 this.slotsButtons[i].SendToBack();

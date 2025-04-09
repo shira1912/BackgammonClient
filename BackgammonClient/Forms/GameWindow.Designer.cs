@@ -35,6 +35,7 @@
             doneButton = new System.Windows.Forms.Button();
             colorPictureBox = new System.Windows.Forms.PictureBox();
             youLabel = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)colorPictureBox).BeginInit();
@@ -42,28 +43,31 @@
             // 
             // roll
             // 
-            roll.Location = new System.Drawing.Point(18, 45);
+            roll.BackColor = System.Drawing.Color.SaddleBrown;
+            roll.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            roll.ForeColor = System.Drawing.Color.Tan;
+            roll.Location = new System.Drawing.Point(17, 45);
             roll.Name = "roll";
-            roll.Size = new System.Drawing.Size(75, 23);
+            roll.Size = new System.Drawing.Size(101, 23);
             roll.TabIndex = 0;
-            roll.Text = "roll";
-            roll.UseVisualStyleBackColor = true;
+            roll.Text = "ROLL THE DICE";
+            roll.UseVisualStyleBackColor = false;
             roll.Click += rollTheDice_click;
             // 
             // pictureBox1
             // 
-            pictureBox1.Location = new System.Drawing.Point(18, 85);
+            pictureBox1.Location = new System.Drawing.Point(27, 74);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new System.Drawing.Size(34, 33);
+            pictureBox1.Size = new System.Drawing.Size(35, 35);
             pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
             // 
             // pictureBox2
             // 
-            pictureBox2.Location = new System.Drawing.Point(58, 85);
+            pictureBox2.Location = new System.Drawing.Point(71, 74);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new System.Drawing.Size(34, 33);
+            pictureBox2.Size = new System.Drawing.Size(35, 35);
             pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             pictureBox2.TabIndex = 2;
             pictureBox2.TabStop = false;
@@ -71,45 +75,68 @@
             // turnLabel
             // 
             turnLabel.AutoSize = true;
-            turnLabel.Location = new System.Drawing.Point(15, 319);
+            turnLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            turnLabel.ForeColor = System.Drawing.Color.SaddleBrown;
+            turnLabel.Location = new System.Drawing.Point(6, 158);
             turnLabel.Name = "turnLabel";
-            turnLabel.Size = new System.Drawing.Size(0, 15);
+            turnLabel.Size = new System.Drawing.Size(129, 15);
             turnLabel.TabIndex = 3;
+            turnLabel.Text = "IT'S NOT YOUR TURN";
             // 
             // doneButton
             // 
-            doneButton.Location = new System.Drawing.Point(18, 268);
+            doneButton.BackColor = System.Drawing.Color.SaddleBrown;
+            doneButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            doneButton.ForeColor = System.Drawing.Color.Tan;
+            doneButton.Location = new System.Drawing.Point(27, 214);
             doneButton.Name = "doneButton";
             doneButton.Size = new System.Drawing.Size(75, 23);
             doneButton.TabIndex = 4;
-            doneButton.Text = "done";
-            doneButton.UseVisualStyleBackColor = true;
+            doneButton.Text = "DONE";
+            doneButton.UseVisualStyleBackColor = false;
             doneButton.Click += doneButton_Click;
             // 
             // colorPictureBox
             // 
-            colorPictureBox.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            colorPictureBox.Location = new System.Drawing.Point(17, 183);
+            colorPictureBox.BackColor = System.Drawing.Color.Silver;
+            colorPictureBox.Location = new System.Drawing.Point(46, 290);
             colorPictureBox.Name = "colorPictureBox";
-            colorPictureBox.Size = new System.Drawing.Size(35, 31);
+            colorPictureBox.Size = new System.Drawing.Size(35, 35);
             colorPictureBox.TabIndex = 5;
             colorPictureBox.TabStop = false;
             // 
             // youLabel
             // 
             youLabel.AutoSize = true;
-            youLabel.Location = new System.Drawing.Point(18, 165);
+            youLabel.BackColor = System.Drawing.Color.Tan;
+            youLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            youLabel.ForeColor = System.Drawing.Color.SaddleBrown;
+            youLabel.Location = new System.Drawing.Point(23, 272);
             youLabel.Name = "youLabel";
-            youLabel.Size = new System.Drawing.Size(30, 15);
+            youLabel.Size = new System.Drawing.Size(82, 15);
             youLabel.TabIndex = 6;
-            youLabel.Text = "you:";
+            youLabel.Text = "YOUR COLOR";
             youLabel.Click += label1_Click;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new System.Drawing.Font("Bell MT", 24F, System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, 0);
+            label3.ForeColor = System.Drawing.Color.SaddleBrown;
+            label3.Location = new System.Drawing.Point(6, 5);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(125, 37);
+            label3.TabIndex = 10;
+            label3.Text = "שש-בש";
+            label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // GameWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.Tan;
             ClientSize = new System.Drawing.Size(800, 450);
+            Controls.Add(label3);
             Controls.Add(youLabel);
             Controls.Add(colorPictureBox);
             Controls.Add(doneButton);
@@ -118,7 +145,7 @@
             Controls.Add(pictureBox1);
             Controls.Add(roll);
             Name = "GameWindow";
-            Text = "GameWindow";
+            Text = "GAME";
             Load += GameWindow_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
@@ -136,5 +163,6 @@
         private System.Windows.Forms.Button doneButton;
         private System.Windows.Forms.PictureBox colorPictureBox;
         private System.Windows.Forms.Label youLabel;
+        private System.Windows.Forms.Label label3;
     }
 }
