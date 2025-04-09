@@ -42,6 +42,8 @@ namespace BackgammonClient.Forms
         private Slot[] slots = new Slot[24];
         private int color;
         private int cube1, cube2, usedCube;
+        private bool cube1Used = false;
+        private bool cube2Used = false;
         private int selectedSlot;
 
         public event Action OnSwitchTurn;
@@ -123,8 +125,7 @@ namespace BackgammonClient.Forms
             for (int i = 0; i < this.discsButtons.Length; i++)
             {
                 if (discsButtons[i] != null)
-                {
-
+                { 
                     this.discsButtons[i].Enabled = turn;
                 }
             }
@@ -165,46 +166,47 @@ namespace BackgammonClient.Forms
             {
                 for (int j = 0; j < slots[i].getQuantity(); j++)
                 {
-                    this.discsButtons[i] = new Button();
+                    // Create a new button for each disc
+                    Button discButton = new Button();
 
                     Point location = this.slotsButtons[i].Location;
                     if (i > (slots.Length / 2) - 1)
                     {
-                        this.discsButtons[i].Location = new System.Drawing.Point(location.X + 10, location.Y - (j * 30) + 120);
+                        discButton.Location = new System.Drawing.Point(location.X + 10, location.Y - (j * 30) + 120);
                     }
-
                     else
                     {
-                        this.discsButtons[i].Location = new System.Drawing.Point(location.X + 10, location.Y + (j * 30));
-
+                        discButton.Location = new System.Drawing.Point(location.X + 10, location.Y + (j * 30));
                     }
+
                     if (slots[i].getColor() == 1)
                     {
-                        this.discsButtons[i].BackColor = discsColor[0]; //white
-                        this.discsButtons[i].Name = counter.ToString();
+                        discButton.BackColor = discsColor[0]; //white
                     }
                     else
                     {
-                        this.discsButtons[i].BackColor = discsColor[1]; //black
-                        this.discsButtons[i].Name = counter.ToString();
-
+                        discButton.BackColor = discsColor[1]; //black
                     }
 
-                    //this.discsButtons[i].Enabled = (discsButtons[i].BackColor == discsColor[this.color]);
-                    //this.discs[i].Name = "disc" + (i + 1);
-                    this.discsButtons[i].Size = new System.Drawing.Size(30, 30);
-                    this.discsButtons[i].TabIndex = 36;
-                    this.discsButtons[i].TabStop = false;
+                    // Store the counter (unique disc ID) and slot information
+                    discButton.Name = counter.ToString();
+                    discButton.Size = new System.Drawing.Size(30, 30);
+                    discButton.TabIndex = 36;
+                    discButton.TabStop = false;
+                    discButton.Click += new System.EventHandler(this.showAvailableSlots);
 
-                    this.discsButtons[i].Click += new System.EventHandler(this.showAvailableSlots);
-                    this.Controls.Add(this.discsButtons[i]);
-                    this.discsButtons[i].BringToFront();
+                    // Store the button in the array
+                    if (counter < discsButtons.Length)
+                    {
+                        this.discsButtons[counter] = discButton;
+                    }
+
+                    this.Controls.Add(discButton);
+                    discButton.BringToFront();
 
                     this.discs[counter] = new Disc(i);
                     counter++;
-                    //this.Controls.SetChildIndex(this.disks[i], 1);
                 }
-
             }
         }
 
@@ -212,38 +214,28 @@ namespace BackgammonClient.Forms
         {
 
             int selectedDiscId = int.Parse(((Button)sender).Name);
-            //   selectedDisc = discs[selectedDiscId];
             Color selectedDiscColor = ((Button)sender).BackColor;
 
-            int slot = discs[selectedDiscId].getSlotId();
-            int slot1 = -1;
-            int slot2 = -1;
+            // Store the selected disc for later use
+            this.selectedDisc = discs[selectedDiscId];
+            int slot = selectedDisc.getSlotId();
 
-
-            bool useCube1 = usedCube != cube1;
-            bool useCube2 = usedCube != cube2;
-            if (selectedDiscColor == discsColor[1]) //black
+            // Disable all slots first
+            for (int i = 0; i < slotsButtons.Length; i++)
             {
-                if (useCube1 && slot + cube1 < this.slotsButtons.Length)
-                    slot1 = slot + cube1;
-
-                if (useCube2 && slot + cube2 < this.slotsButtons.Length)
-                    slot2 = slot + cube2;
-            }
-            else
-            {
-                if (useCube1 && slot - cube1 >= 0)
-                    slot1 = slot - cube1;
-
-                if (useCube2 && slot - cube2 >= 0)
-                    slot2 = slot - cube2;
+                slotsButtons[i].Enabled = false;
             }
 
-            //Only enable if the slot was calculated
-            if (slot1 != -1)
-                enableValidSlot(slot1);
-            if (slot2 != -1)
-                enableValidSlot(slot2);
+            // Only show slots for unused dice
+            if (!cube1Used)
+            {
+                EnableSlotForDie(slot, cube1);
+            }
+
+            if (!cube2Used)
+            {
+                EnableSlotForDie(slot, cube2);
+            }
 
             this.selectedSlot = slot;
 
@@ -284,18 +276,23 @@ namespace BackgammonClient.Forms
 
             int diff = Math.Abs(selectedSlotId - selectedSlot);
 
-            if (diff == cube1 || diff == cube2)
+            // Mark which cube was used
+            if (diff == cube1)
             {
-                usedCube = diff;
+                cube1Used = true;
+                usedCube = cube1;
+            }
+            else if (diff == cube2)
+            {
+                cube2Used = true;
+                usedCube = cube2;
             }
 
             usedCubesAmount++;
             movesRemaining--;
-            // if (usedCubesAmount >= 2 || (cube1 == 0 && cube2 == 0))
 
             // Reset selection
             selectedDisc = null;
-            usedCube = 0;
 
             if (movesRemaining <= 0)
             {
@@ -307,33 +304,47 @@ namespace BackgammonClient.Forms
 
         public void disableUsedCube()
         {
+            // Disable all slots first
             for (int i = 0; i < slotsButtons.Length; i++)
             {
                 slotsButtons[i].Enabled = false;
             }
 
-            if (usedCube == 0) return;
-
+            // If no dice are used yet or no disc is selected, exit
             if (selectedDisc == null) return;
 
             int slot = selectedDisc.getSlotId();
-            int remainingMove = (usedCube == cube1) ? cube2 : cube1;
 
-            int slotTarget1 = -1;
+            // Check which die is still available and enable appropriate slots
+            if (!cube1Used)
+            {
+                EnableSlotForDie(slot, cube1);
+            }
+
+            if (!cube2Used)
+            {
+                EnableSlotForDie(slot, cube2);
+            }
+        }
+
+        // Helper method to enable a slot based on die value
+        private void EnableSlotForDie(int currentSlot, int dieValue)
+        {
+            int targetSlot = -1;
 
             if (this.color == 1) // white
             {
-                if (slot - remainingMove >= 0)
-                    slotTarget1 = slot - remainingMove;
+                if (currentSlot - dieValue >= 0)
+                    targetSlot = currentSlot - dieValue;
             }
             else // black
             {
-                if (slot + remainingMove < slotsButtons.Length)
-                    slotTarget1 = slot + remainingMove;
+                if (currentSlot + dieValue < slotsButtons.Length)
+                    targetSlot = currentSlot + dieValue;
             }
 
-            if (slotTarget1 != -1)
-                enableValidSlot(slotTarget1);
+            if (targetSlot != -1)
+                enableValidSlot(targetSlot);
         }
 
 
@@ -354,6 +365,11 @@ namespace BackgammonClient.Forms
             Random rnd = new Random();
             cube1 = rnd.Next(1, 7);
             cube2 = rnd.Next(1, 7);
+
+            // Reset dice usage flags
+            cube1Used = false;
+            cube2Used = false;
+            usedCube = 0;
 
             if (cube1 == cube2)
             {

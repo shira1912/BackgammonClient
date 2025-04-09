@@ -22,6 +22,7 @@ namespace BackgammonClient.Forms
         private void button1_Click(object sender, EventArgs e)
         {
             OnStartSearchingForGame?.Invoke();
+            this.button1.Enabled = false;
         }
 
         public void changeWaitingLabel()
