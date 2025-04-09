@@ -149,6 +149,18 @@ namespace BackgammonClient
                         break;
                     }
 
+                case "Dice":
+                    {
+                        int remoteCube1 = int.Parse(splitMessage[1]);
+                        int remoteCube2 = int.Parse(splitMessage[2]);
+
+                        this._GameWindow.BeginInvoke(new Action(() => {
+                            _GameWindow.setCubePicture(remoteCube1, 1);
+                            _GameWindow.setCubePicture(remoteCube2, 2);
+                        }));
+                        break;
+                    }
+
                 default:
                     {
                         throw new System.Exception("Unknown message");

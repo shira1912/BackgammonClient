@@ -59,13 +59,13 @@ namespace BackgammonClient.Forms
             buildBoard();
             initialSlots();
             placeDiscs();
-            initalTurn(color == 1);
+            initialTurn(color == 1);
          //   this.colorPictureBox.BackColor = discsColor[1];
         }
 
         public void switchTurn(bool turn)
         {
-            this.Invoke(new delSwitchTurn(initalTurn), turn);
+            this.Invoke(new delSwitchTurn(initialTurn), turn);
         }
 
         public bool isDone()
@@ -77,7 +77,7 @@ namespace BackgammonClient.Forms
             this.Invoke(new delUpdateBoard(stateChanged), state);
         }
 
-        public void initalTurn(bool turn)
+        public void initialTurn(bool turn)
         {
             disableButtons(turn);
             if (turn)
@@ -90,10 +90,7 @@ namespace BackgammonClient.Forms
             }
         }
 
-        //public void initialWhiteDisks()
-        //{
-        //    this.WhitedisksPlaces = [5, 5, 5, 5, 5, 7, 7, 7, 12, 12, 12, 12, 12, 23, 23];
-        //}
+        
 
         public void initialSlots()
         {
@@ -404,6 +401,11 @@ namespace BackgammonClient.Forms
             }
             setCubePicture(cube1, 1);
             setCubePicture(cube2, 2);
+
+            this.roll.Enabled = false;
+
+            //send the dice to the server
+            sendMessage("Dice," + cube1 + "," + cube2);
 
             this.roll.Enabled = false;
 
