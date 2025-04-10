@@ -40,11 +40,19 @@ namespace BackgammonClient.Forms
         private int[] Blackdiscs = new int[15];
 
         private Slot[] slots = new Slot[24];
+        private int selectedSlot;
+
         private int color;
+
         private int cube1, cube2, usedCube;
         private bool cube1Used = false;
         private bool cube2Used = false;
-        private int selectedSlot;
+
+        // Bar representation - one for each player
+        private int whiteOnBar = 0;
+        private int blackOnBar = 0;
+        private Button whiteBarButton;
+        private Button blackBarButton;
 
         public event Action OnSwitchTurn;
         public event Action<string> sendMessage;
@@ -60,7 +68,7 @@ namespace BackgammonClient.Forms
             initialSlots();
             placeDiscs();
             initalTurn(color == 1);
-         
+
         }
 
         public void switchTurn(bool turn)
@@ -90,7 +98,7 @@ namespace BackgammonClient.Forms
             }
         }
 
-        
+
 
         public void initialSlots()
         {
@@ -128,7 +136,7 @@ namespace BackgammonClient.Forms
                     // Only enable discs of the player's color when it's their turn
                     this.discsButtons[i].Enabled = turn &&
                         (this.discsButtons[i].BackColor == discsColor[this.color - 1]);
-   
+
                 }
             }
         }
@@ -150,16 +158,34 @@ namespace BackgammonClient.Forms
 
         public void stateChanged(string state)
         {
-            string[] slotsString = state.Split(';');
+            string[] stateComponents = state.Split(';');
 
-            for (int i = 0; i < slotsString.Length; i++)
+            // Process slots
+            for (int i = 0; i < slots.Length; i++)
             {
-                string[] slot = slotsString[i].Split(':');
-                slots[i].setColor(Int32.Parse(slot[0]));
-                slots[i].setQuantity(Int32.Parse(slot[1]));
+                if (i < stateComponents.Length)
+                {
+                    string[] slot = stateComponents[i].Split(':');
+                    slots[i].setColor(Int32.Parse(slot[0]));
+                    slots[i].setQuantity(Int32.Parse(slot[1]));
+                }
             }
+
+            // Process bar information if available
+            if (stateComponents.Length > slots.Length)
+            {
+                string[] barInfo = stateComponents[slots.Length].Split(':');
+                if (barInfo[0] == "bar" && barInfo.Length == 3)
+                {
+                    whiteOnBar = Int32.Parse(barInfo[1]);
+                    blackOnBar = Int32.Parse(barInfo[2]);
+                    updateBarDisplay();
+                }
+            }
+
             placeDiscs();
         }
+    
         public void placeDiscs()
         {
             initialBoard();
@@ -217,7 +243,7 @@ namespace BackgammonClient.Forms
                 }
             }
         }
-        
+
 
         public void showAvailableSlots(object sender, EventArgs e)
         {
@@ -252,7 +278,7 @@ namespace BackgammonClient.Forms
 
 
         }
-        
+
 
         public void enableValidSlot(int slotId)
         {
@@ -268,6 +294,8 @@ namespace BackgammonClient.Forms
         {
             placeSlotsTop();
             placeSlotsBottom();
+            placeBars();
+
             if (this.color == 1)
             {
                 this.colorPictureBox.BackColor = discsColor[0];
@@ -290,7 +318,28 @@ namespace BackgammonClient.Forms
                 slots[selectedSlot].setQuantity(slots[selectedSlot].getQuantity() - 1);
             }
 
-            // Add disc to the target slot
+            // Check if we're hitting an opponent's checker
+            bool isHit = false;
+            if (slots[selectedSlotId].getQuantity() == 1 && slots[selectedSlotId].getColor() != this.color)
+            {
+                // This is a hit!
+                isHit = true;
+
+                // Add the hit checker to the appropriate bar
+                if (this.color == 1) // White hits Black
+                {
+                    blackOnBar++;
+                }
+                else // Black hits White
+                {
+                    whiteOnBar++;
+                }
+
+                // Clear the slot for our checker
+                slots[selectedSlotId].setQuantity(0);
+            }
+
+            // Add our disc to the target slot
             slots[selectedSlotId].setQuantity(slots[selectedSlotId].getQuantity() + 1);
             slots[selectedSlotId].setColor(this.color);
 
@@ -321,6 +370,7 @@ namespace BackgammonClient.Forms
 
             // Important: Redraw the board to reflect changes
             placeDiscs();
+            updateBarDisplay(); // New method to update bar visualization
 
             disableUsedCube();
             sendState();
@@ -371,6 +421,69 @@ namespace BackgammonClient.Forms
             if (targetSlot != -1)
                 enableValidSlot(targetSlot);
         }
+        private void setupBarButtons()
+        {
+            // Add click events to bar buttons
+            whiteBarButton.Click += new System.EventHandler(this.BarClick);
+            blackBarButton.Click += new System.EventHandler(this.BarClick);
+        }
+
+        private void BarClick(object sender, EventArgs e)
+        {
+            // Only allow clicking your own bar
+            if ((sender == whiteBarButton && this.color == 1 && whiteOnBar > 0) ||
+                (sender == blackBarButton && this.color == 2 && blackOnBar > 0))
+            {
+                // Disable all slot buttons first
+                for (int i = 0; i < slotsButtons.Length; i++)
+                {
+                    slotsButtons[i].Enabled = false;
+                    slotsButtons[i].BackColor = System.Drawing.Color.Silver;
+                }
+
+                // Enable valid entry points based on dice
+                if (!cube1Used)
+                {
+                    EnableEntryPoint(cube1);
+                }
+
+                if (!cube2Used)
+                {
+                    EnableEntryPoint(cube2);
+                }
+            }
+        }
+
+        private void EnableEntryPoint(int dieValue)
+        {
+            int entryPoint;
+
+            if (this.color == 1) // White
+            {
+                // White enters from point 24 (which is 23 in 0-based indexing)
+                entryPoint = 24 - dieValue;
+            }
+            else // Black
+            {
+                // Black enters from point 1 (which is 0 in 0-based indexing)
+                entryPoint = dieValue - 1;
+            }
+
+            // Check if the entry point is valid and within bounds
+            if (entryPoint >= 0 && entryPoint < 24)
+            {
+                enableValidSlot(entryPoint);
+            }
+        }
+        private void updateBarDisplay()
+        {
+            // Update the bar display with the number of checkers
+            whiteBarButton.Text = "W Bar (" + whiteOnBar + ")";
+            blackBarButton.Text = "W Bar (" + blackOnBar + ")";
+
+            // Optional: visualize checkers on the bar
+            // (You could add small disc buttons or just use the text as above)
+        }
 
 
         public void sendState()
@@ -380,8 +493,12 @@ namespace BackgammonClient.Forms
             {
                 slotsString[i] = slots[i].toString();
             }
-            sendMessage("State," + string.Join(";", slotsString));
-        }
+
+            // Add bar information to the state
+            string barInfo = "bar:" + whiteOnBar + ":" + blackOnBar;
+
+            sendMessage("State," + string.Join(";", slotsString) + ";" + barInfo);
+         }
 
 
 
@@ -480,6 +597,30 @@ namespace BackgammonClient.Forms
                 x += 50;
             }
             x = 50;
+        }
+
+        public void placeBars()
+        {
+            // Create bar buttons
+            whiteBarButton = new Button();
+            whiteBarButton.Location = new System.Drawing.Point(425, 10);
+            whiteBarButton.Name = "whiteBar";
+            whiteBarButton.Size = new System.Drawing.Size(50, 150);
+            whiteBarButton.TabIndex = 40;
+            whiteBarButton.TabStop = false;
+            whiteBarButton.BackColor = System.Drawing.Color.DarkGray;
+            whiteBarButton.Text = "W Bar";
+            this.Controls.Add(whiteBarButton);
+
+            blackBarButton = new Button();
+            blackBarButton.Location = new System.Drawing.Point(425, 285);
+            blackBarButton.Name = "blackBar";
+            blackBarButton.Size = new System.Drawing.Size(50, 153);
+            blackBarButton.TabIndex = 41;
+            blackBarButton.TabStop = false;
+            blackBarButton.BackColor = System.Drawing.Color.DarkGray;
+            blackBarButton.Text = "B Bar";
+            this.Controls.Add(blackBarButton);
         }
 
         public void setCubePicture(int cube, int cubeNum)
