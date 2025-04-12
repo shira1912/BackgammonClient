@@ -36,7 +36,7 @@
             colorPictureBox = new System.Windows.Forms.PictureBox();
             youLabel = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
-            label1 = new System.Windows.Forms.Label();
+            updatesLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)colorPictureBox).BeginInit();
@@ -131,22 +131,21 @@
             label3.Text = "שש-בש";
             label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label1
+            // updatesLabel
             // 
-            label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label1.Location = new System.Drawing.Point(17, 337);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(112, 50);
-            label1.TabIndex = 11;
-            label1.Text = "You must move your checkers from the bar first!";
+            updatesLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            updatesLabel.Location = new System.Drawing.Point(17, 337);
+            updatesLabel.Name = "updatesLabel";
+            updatesLabel.Size = new System.Drawing.Size(112, 50);
+            updatesLabel.TabIndex = 11;
             // 
             // GameWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.Tan;
-            ClientSize = new System.Drawing.Size(800, 450);
-            Controls.Add(label1);
+            ClientSize = new System.Drawing.Size(984, 461);
+            Controls.Add(updatesLabel);
             Controls.Add(label3);
             Controls.Add(youLabel);
             Controls.Add(colorPictureBox);
@@ -175,6 +174,6 @@
         private System.Windows.Forms.PictureBox colorPictureBox;
         private System.Windows.Forms.Label youLabel;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label updatesLabel;
     }
 }

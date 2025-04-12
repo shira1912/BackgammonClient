@@ -1,4 +1,5 @@
-﻿using BackgammonClient.Objects;
+﻿
+using BackgammonClient.Objects;
 using BackgammonClient.Properties;
 using DataProtocols;
 using Microsoft.VisualBasic.ApplicationServices;
@@ -111,6 +112,7 @@ namespace BackgammonClient.Forms
 
         public void initalTurn(bool turn)
         {
+            this.updatesLabel.Text = "";
             disableButtons(turn);
             if (turn)
             {
@@ -179,8 +181,11 @@ namespace BackgammonClient.Forms
                     // White player has checkers on bar - ONLY enable white bar disc button
                     whiteBarDiscButton.Enabled = true;
 
-                    // Important: Make sure the bar disc is visible
+                    // Make sure the bar disc is visible
                     whiteBarDiscButton.Visible = true;
+
+                    // Set the updates label message
+                    this.updatesLabel.Text = "You must move your checkers from the bar first!";
                 }
                 else
                 {
@@ -202,8 +207,11 @@ namespace BackgammonClient.Forms
                     // Black player has checkers on bar - ONLY enable black bar disc button
                     blackBarDiscButton.Enabled = true;
 
-                    // Important: Make sure the bar disc is visible
+                    // Make sure the bar disc is visible
                     blackBarDiscButton.Visible = true;
+
+                    // Set the updates label message
+                    this.updatesLabel.Text = "You must move your checkers from the bar first!";
                 }
                 else
                 {
@@ -350,7 +358,8 @@ namespace BackgammonClient.Forms
             // If player has checkers on the bar, they must move those first
             if (playerHasCheckersOnBar)
             {
-                MessageBox.Show("You must move your checkers from the bar first!");
+                // Update the label instead of showing a message box
+                this.updatesLabel.Text = "You must move your checkers from the bar first!";
                 return;
             }
 
@@ -527,7 +536,8 @@ namespace BackgammonClient.Forms
 
                 if (!hasValidMove && movesRemaining > 0)
                 {
-                    MessageBox.Show("No valid moves available to enter from the bar. Turn passes.");
+                    // Update label instead of showing a message box
+                    this.updatesLabel.Text = "No valid moves available to enter from the bar. Turn passes.";
                     this.OnSwitchTurn?.Invoke();
                 }
             }
@@ -663,7 +673,8 @@ namespace BackgammonClient.Forms
                 // If no valid moves available, switch turn
                 if (!hasValidMove && movesRemaining > 0)
                 {
-                    MessageBox.Show("No valid moves available to enter from the bar. Turn passes.");
+                    // Update label instead of showing a message box
+                    this.updatesLabel.Text = "No valid moves available to enter from the bar. Turn passes.";
                     movingFromBar = false; // Reset the flag
                     this.OnSwitchTurn?.Invoke();
                 }
@@ -769,6 +780,9 @@ namespace BackgammonClient.Forms
 
         private void rollTheDice_click(object sender, EventArgs e)
         {
+            // Clear any previous updates message
+            this.updatesLabel.Text = "";
+
             Random rnd = new Random();
             cube1 = rnd.Next(1, 7);
             cube2 = rnd.Next(1, 7);
@@ -807,7 +821,8 @@ namespace BackgammonClient.Forms
 
                 if (!hasValidMove)
                 {
-                    MessageBox.Show("No valid moves available to enter from the bar. Turn passes.");
+                    // Update label instead of showing a message box
+                    this.updatesLabel.Text = "No valid moves available to enter from the bar. Turn passes.";
                     this.OnSwitchTurn?.Invoke();
                 }
             }
@@ -862,7 +877,6 @@ namespace BackgammonClient.Forms
                 x -= 50;
             }
         }
-
         public void placeSlotsBottom()
         {
             int y = 285;
@@ -903,32 +917,8 @@ namespace BackgammonClient.Forms
 
 
         }
-
         public void placeBars()
         {
-            // Create bar buttons
-            //whiteBarButton = new Button();
-            //whiteBarButton.Location = new System.Drawing.Point(425, 10);
-            //whiteBarButton.Name = "whiteBar";
-            //whiteBarButton.Size = new System.Drawing.Size(50, 150);
-            //whiteBarButton.TabIndex = 40;
-            //whiteBarButton.TabStop = false;
-            //whiteBarButton.BackColor = System.Drawing.Color.DarkGray;
-            //whiteBarButton.Text = "W Bar";
-            //whiteBarButton.Enabled = false; // Disable the bar button
-            //this.Controls.Add(whiteBarButton);
-
-            //blackBarButton = new Button();
-            //blackBarButton.Location = new System.Drawing.Point(425, 285);
-            //blackBarButton.Name = "blackBar";
-            //blackBarButton.Size = new System.Drawing.Size(50, 153);
-            //blackBarButton.TabIndex = 41;
-            //blackBarButton.TabStop = false;
-            //blackBarButton.BackColor = System.Drawing.Color.DarkGray;
-            //blackBarButton.Text = "B Bar";
-            //blackBarButton.Enabled = false; // Disable the bar button
-            //this.Controls.Add(blackBarButton);
-
             // Create disc buttons that sit on top of the bar buttons
             whiteBarDiscButton = new Button();
             whiteBarDiscButton.Location = new System.Drawing.Point(425 + 10, 110 + 60); // Center on bar
