@@ -65,7 +65,9 @@ namespace BackgammonClient.Forms
         private Image whiteSlotTopImage;
         private Image redSlotBottonImage;
         private Image whiteSlotBottomImage;
-        
+
+        // Flag to track if we're moving from the bar
+        private bool movingFromBar = false;
 
         public event Action OnSwitchTurn;
         public event Action<string> sendMessage;
@@ -138,7 +140,7 @@ namespace BackgammonClient.Forms
 
         public void disableButtons(bool turn)
         {
-            // Disable all slot buttons
+            // Always start by disabling all slot buttons
             for (int i = 0; i < slots.Length; i++)
             {
                 this.slotsButtons[i].Enabled = false;
@@ -148,27 +150,72 @@ namespace BackgammonClient.Forms
             roll.Enabled = turn;
             doneButton.Enabled = turn;
 
-            // Enable/disable disc buttons based on turn and color
+            // Initially disable ALL disc buttons
             for (int i = 0; i < this.discsButtons.Length; i++)
             {
                 if (discsButtons[i] != null)
                 {
-                    // Only enable discs of the player's color when it's their turn
-                    // CHANGED: Check Tag instead of BackColor
-                    this.discsButtons[i].Enabled = turn &&
-                        ((int)this.discsButtons[i].Tag == this.color);
+                    this.discsButtons[i].Enabled = false;
                 }
             }
 
-            // Enable/disable bar disc buttons based on turn and color
-            if (whiteOnBar > 0)
-            {
-                whiteBarDiscButton.Enabled = turn && this.color == 1;
-            }
+            // Initially disable bar buttons
+            whiteBarDiscButton.Enabled = false;
+            blackBarDiscButton.Enabled = false;
 
-            if (blackOnBar > 0)
+            // If it's not the player's turn, we're done (everything remains disabled)
+            if (!turn)
+                return;
+
+            // Check if player has checkers on the bar
+            bool whiteHasCheckersOnBar = whiteOnBar > 0;
+            bool blackHasCheckersOnBar = blackOnBar > 0;
+
+            // WHITE PLAYER'S TURN
+            if (this.color == 1 && turn)
             {
-                blackBarDiscButton.Enabled = turn && this.color == 2;
+                if (whiteHasCheckersOnBar)
+                {
+                    // White player has checkers on bar - ONLY enable white bar disc button
+                    whiteBarDiscButton.Enabled = true;
+
+                    // Important: Make sure the bar disc is visible
+                    whiteBarDiscButton.Visible = true;
+                }
+                else
+                {
+                    // No checkers on bar - enable regular white disc buttons
+                    for (int i = 0; i < this.discsButtons.Length; i++)
+                    {
+                        if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == 1)
+                        {
+                            this.discsButtons[i].Enabled = true;
+                        }
+                    }
+                }
+            }
+            // BLACK PLAYER'S TURN
+            else if (this.color == 2 && turn)
+            {
+                if (blackHasCheckersOnBar)
+                {
+                    // Black player has checkers on bar - ONLY enable black bar disc button
+                    blackBarDiscButton.Enabled = true;
+
+                    // Important: Make sure the bar disc is visible
+                    blackBarDiscButton.Visible = true;
+                }
+                else
+                {
+                    // No checkers on bar - enable regular black disc buttons
+                    for (int i = 0; i < this.discsButtons.Length; i++)
+                    {
+                        if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == 2)
+                        {
+                            this.discsButtons[i].Enabled = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -230,7 +277,7 @@ namespace BackgammonClient.Forms
                         continue;
                     }
 
-                    this.discsButtons[counter] = new Button(); 
+                    this.discsButtons[counter] = new Button();
 
                     Point location = this.slotsButtons[i].Location;
                     if (i > (slots.Length / 2) - 1)
@@ -270,9 +317,18 @@ namespace BackgammonClient.Forms
 
                     // Check if it's the player's turn and if the disc color matches the player's color
                     bool isTurn = this.turnLabel.Text == "IT'S YOUR TURN";
-                    // CHANGED: Check Tag instead of BackColor
-                    this.discsButtons[counter].Enabled = isTurn &&
-                        ((int)this.discsButtons[counter].Tag == this.color);
+
+                    // Don't enable regular discs if there are checkers on the bar
+                    bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) || (this.color == 2 && blackOnBar > 0);
+                    if (playerHasCheckersOnBar)
+                    {
+                        this.discsButtons[counter].Enabled = false;
+                    }
+                    else
+                    {
+                        // Enable only if it's the player's turn and the disc color matches
+                        this.discsButtons[counter].Enabled = isTurn && ((int)this.discsButtons[counter].Tag == this.color);
+                    }
 
                     this.discsButtons[counter].Click += new System.EventHandler(this.showAvailableSlots);
 
@@ -287,8 +343,19 @@ namespace BackgammonClient.Forms
 
         public void showAvailableSlots(object sender, EventArgs e)
         {
+            // Check if player has checkers on the bar
+            bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) ||
+                                         (this.color == 2 && blackOnBar > 0);
+
+            // If player has checkers on the bar, they must move those first
+            if (playerHasCheckersOnBar)
+            {
+                MessageBox.Show("You must move your checkers from the bar first!");
+                return;
+            }
+
+            // Continue with normal disc selection logic
             int selectedDiscId = int.Parse(((Button)sender).Name);
-            // CHANGED: Get color from Tag instead of BackColor
             int selectedDiscColor = (int)((Button)sender).Tag;
 
             // Store the selected disc for later use
@@ -346,10 +413,14 @@ namespace BackgammonClient.Forms
             string[] selectedSlotName = ((Button)sender).Name.Split(',');
             int selectedSlotId = int.Parse(selectedSlotName[1]);
 
-            // Make sure we properly decrement the quantity at the starting slot
-            if (slots[selectedSlot].getQuantity() > 0)
+            // Use the movingFromBar flag to determine if we're moving from the bar
+            if (!movingFromBar)
             {
-                slots[selectedSlot].setQuantity(slots[selectedSlot].getQuantity() - 1);
+                // Regular move from a slot
+                if (slots[selectedSlot].getQuantity() > 0)
+                {
+                    slots[selectedSlot].setQuantity(slots[selectedSlot].getQuantity() - 1);
+                }
             }
 
             // Check if we're hitting an opponent's checker
@@ -377,7 +448,36 @@ namespace BackgammonClient.Forms
             slots[selectedSlotId].setQuantity(slots[selectedSlotId].getQuantity() + 1);
             slots[selectedSlotId].setColor(this.color);
 
-            int diff = Math.Abs(selectedSlotId - selectedSlot);
+            // If we moved from bar, decrement the appropriate bar counter
+            if (movingFromBar)
+            {
+                if (this.color == 1)
+                {
+                    whiteOnBar--;
+                }
+                else
+                {
+                    blackOnBar--;
+                }
+            }
+
+            int diff;
+            if (movingFromBar)
+            {
+                // Calculate the difference based on entry point rules
+                if (this.color == 1) // White
+                {
+                    diff = 24 - selectedSlotId;
+                }
+                else // Black
+                {
+                    diff = selectedSlotId + 1;
+                }
+            }
+            else
+            {
+                diff = Math.Abs(selectedSlotId - selectedSlot);
+            }
 
             // Mark which cube was used
             if (diff == cube1)
@@ -394,6 +494,9 @@ namespace BackgammonClient.Forms
             usedCubesAmount++;
             movesRemaining--;
 
+            // Reset the movingFromBar flag
+            movingFromBar = false;
+
             // Reset selection
             selectedDisc = null;
 
@@ -404,10 +507,60 @@ namespace BackgammonClient.Forms
 
             // Important: Redraw the board to reflect changes
             placeDiscs();
-            updateBarDisplay(); // New method to update bar visualization
+            updateBarDisplay(); // Update bar visualization
+
+            // Check if we still have checkers on the bar and if it's still our turn
+            if ((this.color == 1 && whiteOnBar > 0) || (this.color == 2 && blackOnBar > 0))
+            {
+                // We still have checkers on the bar, check if there are valid moves
+                bool hasValidMove = false;
+
+                if (!cube1Used)
+                {
+                    hasValidMove |= CheckValidEntryExists(cube1);
+                }
+
+                if (!cube2Used)
+                {
+                    hasValidMove |= CheckValidEntryExists(cube2);
+                }
+
+                if (!hasValidMove && movesRemaining > 0)
+                {
+                    MessageBox.Show("No valid moves available to enter from the bar. Turn passes.");
+                    this.OnSwitchTurn?.Invoke();
+                }
+            }
 
             disableUsedCube();
             sendState();
+        }
+
+        private bool CheckValidEntryExists(int dieValue)
+        {
+            int entryPoint;
+
+            if (this.color == 1) // White
+            {
+                entryPoint = 24 - dieValue;
+            }
+            else // Black
+            {
+                entryPoint = dieValue - 1;
+            }
+
+            // Check if this point is a valid entry
+            if (entryPoint >= 0 && entryPoint < 24)
+            {
+                if (slots[entryPoint].getColor() == this.color ||
+                    slots[entryPoint].getQuantity() <= 1 ||
+                    slots[entryPoint].getQuantity() == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void disableUsedCube()
@@ -417,6 +570,25 @@ namespace BackgammonClient.Forms
             {
                 slotsButtons[i].Enabled = false;
                 this.slotsButtons[i].BackColor = System.Drawing.Color.Silver;
+            }
+
+            // Check if player has checkers on the bar
+            bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) ||
+                                         (this.color == 2 && blackOnBar > 0);
+
+            if (playerHasCheckersOnBar)
+            {
+                // Player has checkers on the bar, show entry points
+                if (!cube1Used)
+                {
+                    EnableEntryPoint(cube1);
+                }
+
+                if (!cube2Used)
+                {
+                    EnableEntryPoint(cube2);
+                }
+                return;
             }
 
             // If no dice are used yet or no disc is selected, exit
@@ -461,6 +633,9 @@ namespace BackgammonClient.Forms
             Button clickedButton = (Button)sender;
             bool isWhiteBar = clickedButton == whiteBarDiscButton;
 
+            // Set the movingFromBar flag
+            movingFromBar = true;
+
             // Only allow clicking your own bar disc
             if ((isWhiteBar && this.color == 1 && whiteOnBar > 0) ||
                 (!isWhiteBar && this.color == 2 && blackOnBar > 0))
@@ -473,21 +648,32 @@ namespace BackgammonClient.Forms
                 }
 
                 // Enable valid entry points based on dice
+                bool hasValidMove = false;
+
                 if (!cube1Used)
                 {
-                    EnableEntryPoint(cube1);
+                    hasValidMove |= EnableEntryPoint(cube1);
                 }
 
                 if (!cube2Used)
                 {
-                    EnableEntryPoint(cube2);
+                    hasValidMove |= EnableEntryPoint(cube2);
+                }
+
+                // If no valid moves available, switch turn
+                if (!hasValidMove && movesRemaining > 0)
+                {
+                    MessageBox.Show("No valid moves available to enter from the bar. Turn passes.");
+                    movingFromBar = false; // Reset the flag
+                    this.OnSwitchTurn?.Invoke();
                 }
             }
         }
 
-        private void EnableEntryPoint(int dieValue)
+        private bool EnableEntryPoint(int dieValue)
         {
             int entryPoint;
+            bool validMoveFound = false;
 
             if (this.color == 1) // White
             {
@@ -503,23 +689,29 @@ namespace BackgammonClient.Forms
             // Check if the entry point is valid and within bounds
             if (entryPoint >= 0 && entryPoint < 24)
             {
-                enableValidSlot(entryPoint);
+                // Check if this point is a valid entry (either empty, has our pieces, or only 1 opponent piece)
+                if (slots[entryPoint].getColor() == this.color ||
+                    slots[entryPoint].getQuantity() <= 1 ||
+                    slots[entryPoint].getQuantity() == 0)
+                {
+                    this.slotsButtons[entryPoint].Enabled = true;
+                    this.slotsButtons[entryPoint].BackColor = System.Drawing.Color.Gainsboro;
+                    validMoveFound = true;
+                }
             }
+
+            return validMoveFound;
         }
 
         private void updateBarDisplay()
         {
-            // Update the bar labels
-            //whiteBarButton.Text = "W Bar";
-            //blackBarButton.Text = "B Bar";
-
             // Update white bar disc
             if (whiteOnBar > 0)
             {
                 whiteBarDiscButton.Visible = true;
                 whiteBarDiscButton.Text = whiteOnBar > 1 ? whiteOnBar.ToString() : "";
 
-                // CHANGED: Set background image instead of color
+                // Set background image instead of color
                 whiteBarDiscButton.BackgroundImage = whiteDiscImage;
                 whiteBarDiscButton.BackgroundImageLayout = ImageLayout.Stretch;
                 whiteBarDiscButton.Tag = 1; // Tag as white
@@ -542,7 +734,7 @@ namespace BackgammonClient.Forms
                 blackBarDiscButton.Visible = true;
                 blackBarDiscButton.Text = blackOnBar > 1 ? blackOnBar.ToString() : "";
 
-                // CHANGED: Set background image instead of color
+                // Set background image instead of color
                 blackBarDiscButton.BackgroundImage = blackDiscImage;
                 blackBarDiscButton.BackgroundImageLayout = ImageLayout.Stretch;
                 blackBarDiscButton.Tag = 2; // Tag as black
@@ -602,7 +794,26 @@ namespace BackgammonClient.Forms
             //send the dice to the server
             sendMessage("Dice," + cube1 + "," + cube2);
 
-            this.roll.Enabled = false;
+            // Check if player has checkers on the bar and no valid moves
+            bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) ||
+                                         (this.color == 2 && blackOnBar > 0);
+
+            if (playerHasCheckersOnBar)
+            {
+                bool hasValidMove = false;
+
+                hasValidMove |= CheckValidEntryExists(cube1);
+                hasValidMove |= CheckValidEntryExists(cube2);
+
+                if (!hasValidMove)
+                {
+                    MessageBox.Show("No valid moves available to enter from the bar. Turn passes.");
+                    this.OnSwitchTurn?.Invoke();
+                }
+            }
+
+            // Update button states after roll
+            disableButtons(true);
         }
 
         private void doneButton_Click(object sender, EventArgs e)
@@ -690,7 +901,7 @@ namespace BackgammonClient.Forms
             }
             x = 50;
 
-            
+
         }
 
         public void placeBars()
