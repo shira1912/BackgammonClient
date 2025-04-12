@@ -113,7 +113,24 @@ namespace BackgammonClient.Forms
         public void initalTurn(bool turn)
         {
             this.updatesLabel.Text = "";
+
+            // When starting a new turn, reset dice and move counters
+            if (turn)
+            {
+                // Reset dice usage when a new turn starts
+                cube1Used = false;
+                cube2Used = false;
+                cube1 = 0;
+                cube2 = 0;
+                movesRemaining = 0;
+
+                // Clear the dice images
+                pictureBox1.Image = null;
+                pictureBox2.Image = null;
+            }
+
             disableButtons(turn);
+
             if (turn)
             {
                 this.turnLabel.Text = "IT'S YOUR TURN";
@@ -148,9 +165,28 @@ namespace BackgammonClient.Forms
                 this.slotsButtons[i].Enabled = false;
             }
 
-            // Enable/disable roll and done buttons based on turn
-            roll.Enabled = turn;
+            // Enable/disable done button based on turn
+            this.roll.Enabled = false;
             doneButton.Enabled = turn;
+
+            // Only enable roll button if it's a new turn
+            // We don't want to re-enable it if it was explicitly disabled after rolling
+            if (turn && (cube1Used || cube2Used || movesRemaining == 0))
+            {
+                // If dice were used or there are no moves remaining, roll should stay disabled
+                roll.Enabled = false;
+            }
+            else if (turn && movesRemaining == 0)
+            {
+                // If it's a new turn (no moves remaining from previous turn), enable the roll button
+                roll.Enabled = true;
+            }
+
+            // For the initial turn, we want roll to be enabled
+            if (turn && cube1 == 0 && cube2 == 0)
+            {
+                roll.Enabled = true;
+            }
 
             // Initially disable ALL disc buttons
             for (int i = 0; i < this.discsButtons.Length; i++)
@@ -197,6 +233,7 @@ namespace BackgammonClient.Forms
                             this.discsButtons[i].Enabled = true;
                         }
                     }
+                    this.updatesLabel.Text = "";
                 }
             }
             // BLACK PLAYER'S TURN
@@ -223,7 +260,8 @@ namespace BackgammonClient.Forms
                             this.discsButtons[i].Enabled = true;
                         }
                     }
-                }
+                    this.updatesLabel.Text = "";
+                }            
             }
         }
 
@@ -238,6 +276,7 @@ namespace BackgammonClient.Forms
                     discsButtons[i] = null;
                 }
             }
+            this.updatesLabel.Text = "";
         }
 
         public void stateChanged(string state)
@@ -843,7 +882,7 @@ namespace BackgammonClient.Forms
 
         public void placeSlotsTop()
         {
-            int x = 725;
+            int x = 735;
             int y = 10;
             for (int i = 0; i < slotsButtons.Length / 2; i++)
             {
@@ -880,7 +919,7 @@ namespace BackgammonClient.Forms
         public void placeSlotsBottom()
         {
             int y = 285;
-            int x = 125;
+            int x = 135;
             for (int i = slotsButtons.GetLength(0) / 2; i < slotsButtons.Length; i++)
             {
                 this.slotsButtons[i] = new Button();
@@ -921,7 +960,7 @@ namespace BackgammonClient.Forms
         {
             // Create disc buttons that sit on top of the bar buttons
             whiteBarDiscButton = new Button();
-            whiteBarDiscButton.Location = new System.Drawing.Point(425 + 10, 110 + 60); // Center on bar
+            whiteBarDiscButton.Location = new System.Drawing.Point(435 + 10, 130 + 60); // Center on bar
             whiteBarDiscButton.Name = "whiteBarDisc";
             whiteBarDiscButton.Size = new System.Drawing.Size(30, 30); // Same as other disc buttons
             whiteBarDiscButton.TabIndex = 42;
@@ -938,7 +977,7 @@ namespace BackgammonClient.Forms
             whiteBarDiscButton.BringToFront();
 
             blackBarDiscButton = new Button();
-            blackBarDiscButton.Location = new System.Drawing.Point(425 + 10, 185 + 60); // Center on bar
+            blackBarDiscButton.Location = new System.Drawing.Point(435 + 10, 165 + 60); // Center on bar
             blackBarDiscButton.Name = "blackBarDisc";
             blackBarDiscButton.Size = new System.Drawing.Size(30, 30); // Same as other disc buttons
             blackBarDiscButton.TabIndex = 43;
