@@ -185,7 +185,7 @@ namespace BackgammonClient.Forms
 
             placeDiscs();
         }
-    
+
         public void placeDiscs()
         {
             initialBoard();
@@ -479,7 +479,7 @@ namespace BackgammonClient.Forms
         {
             // Update the bar display with the number of checkers
             whiteBarButton.Text = "W Bar (" + whiteOnBar + ")";
-            blackBarButton.Text = "W Bar (" + blackOnBar + ")";
+            blackBarButton.Text = "B Bar (" + blackOnBar + ")";
 
             // Optional: visualize checkers on the bar
             // (You could add small disc buttons or just use the text as above)
@@ -498,7 +498,7 @@ namespace BackgammonClient.Forms
             string barInfo = "bar:" + whiteOnBar + ":" + blackOnBar;
 
             sendMessage("State," + string.Join(";", slotsString) + ";" + barInfo);
-         }
+        }
 
 
 
