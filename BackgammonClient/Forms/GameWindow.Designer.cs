@@ -76,7 +76,7 @@
             // 
             turnLabel.AutoSize = true;
             turnLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            turnLabel.ForeColor = System.Drawing.Color.SaddleBrown;
+            turnLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             turnLabel.Location = new System.Drawing.Point(6, 158);
             turnLabel.Name = "turnLabel";
             turnLabel.Size = new System.Drawing.Size(129, 15);

@@ -51,12 +51,21 @@ namespace BackgammonClient.Forms
         // Bar representation - one for each player
         private int whiteOnBar = 0;
         private int blackOnBar = 0;
-        private Button whiteBarButton;
-        private Button blackBarButton;
+        //private Button whiteBarButton;
+        //private Button blackBarButton;
 
         // Disc buttons for the bar
         private Button whiteBarDiscButton;
         private Button blackBarDiscButton;
+
+        // Images for discs
+        private Image whiteDiscImage;
+        private Image blackDiscImage;
+        private Image redSlotTopImage;
+        private Image whiteSlotTopImage;
+        private Image redSlotBottonImage;
+        private Image whiteSlotBottomImage;
+        
 
         public event Action OnSwitchTurn;
         public event Action<string> sendMessage;
@@ -68,12 +77,20 @@ namespace BackgammonClient.Forms
         {
             InitializeComponent();
             this.color = color;
+
+            // Load the disc images once
+            whiteDiscImage = Image.FromFile(@"../../../boardImages/white.png");
+            blackDiscImage = Image.FromFile(@"../../../boardImages/black.png");
+            redSlotTopImage = Image.FromFile(@"../../../boardImages/red slot top.png");
+            whiteSlotTopImage = Image.FromFile(@"../../../boardImages/white slot top.png");
+            redSlotBottonImage = Image.FromFile(@"../../../boardImages/red slot.png");
+            whiteSlotBottomImage = Image.FromFile(@"../../../boardImages/white slot.png");
+
             buildBoard();
             initialSlots();
             placeDiscs();
             updateBarDisplay();
             initalTurn(color == 1);
-
         }
 
         public void switchTurn(bool turn)
@@ -102,8 +119,6 @@ namespace BackgammonClient.Forms
                 this.turnLabel.Text = "IT'S NOT YOUR TURN";
             }
         }
-
-
 
         public void initialSlots()
         {
@@ -139,8 +154,9 @@ namespace BackgammonClient.Forms
                 if (discsButtons[i] != null)
                 {
                     // Only enable discs of the player's color when it's their turn
+                    // CHANGED: Check Tag instead of BackColor
                     this.discsButtons[i].Enabled = turn &&
-                        (this.discsButtons[i].BackColor == discsColor[this.color - 1]);
+                        ((int)this.discsButtons[i].Tag == this.color);
                 }
             }
 
@@ -167,8 +183,6 @@ namespace BackgammonClient.Forms
                     discsButtons[i] = null;
                 }
             }
-
-
         }
 
         public void stateChanged(string state)
@@ -216,7 +230,7 @@ namespace BackgammonClient.Forms
                         continue;
                     }
 
-                    this.discsButtons[counter] = new Button(); // Use counter instead of i
+                    this.discsButtons[counter] = new Button(); 
 
                     Point location = this.slotsButtons[i].Location;
                     if (i > (slots.Length / 2) - 1)
@@ -228,16 +242,27 @@ namespace BackgammonClient.Forms
                         this.discsButtons[counter].Location = new System.Drawing.Point(location.X + 10, location.Y + (j * 30));
                     }
 
+                    // Set background image and Tag, and BackColor
                     if (slots[i].getColor() == 1)
                     {
-                        this.discsButtons[counter].BackColor = discsColor[0]; // white
+                        this.discsButtons[counter].BackgroundImage = whiteDiscImage;
+                        this.discsButtons[counter].BackgroundImageLayout = ImageLayout.Stretch;
+                        this.discsButtons[counter].Tag = 1; // 1 for white
                         this.discsButtons[counter].Name = counter.ToString();
                     }
                     else
                     {
-                        this.discsButtons[counter].BackColor = discsColor[1]; // black
+                        this.discsButtons[counter].BackgroundImage = blackDiscImage;
+                        this.discsButtons[counter].BackgroundImageLayout = ImageLayout.Stretch;
+                        this.discsButtons[counter].Tag = 2; // 2 for black
                         this.discsButtons[counter].Name = counter.ToString();
                     }
+
+                    // Make buttons transparent
+                    this.discsButtons[counter].FlatStyle = FlatStyle.Flat;
+                    this.discsButtons[counter].FlatAppearance.BorderSize = 0;
+                    this.discsButtons[counter].BackColor = Color.Transparent;
+                    this.discsButtons[counter].UseVisualStyleBackColor = false; // Add this line
 
                     this.discsButtons[counter].Size = new System.Drawing.Size(30, 30);
                     this.discsButtons[counter].TabIndex = 36;
@@ -245,8 +270,9 @@ namespace BackgammonClient.Forms
 
                     // Check if it's the player's turn and if the disc color matches the player's color
                     bool isTurn = this.turnLabel.Text == "IT'S YOUR TURN";
+                    // CHANGED: Check Tag instead of BackColor
                     this.discsButtons[counter].Enabled = isTurn &&
-                        (this.discsButtons[counter].BackColor == discsColor[this.color - 1]);
+                        ((int)this.discsButtons[counter].Tag == this.color);
 
                     this.discsButtons[counter].Click += new System.EventHandler(this.showAvailableSlots);
 
@@ -259,12 +285,11 @@ namespace BackgammonClient.Forms
             }
         }
 
-
         public void showAvailableSlots(object sender, EventArgs e)
         {
-
             int selectedDiscId = int.Parse(((Button)sender).Name);
-            Color selectedDiscColor = ((Button)sender).BackColor;
+            // CHANGED: Get color from Tag instead of BackColor
+            int selectedDiscColor = (int)((Button)sender).Tag;
 
             // Store the selected disc for later use
             this.selectedDisc = discs[selectedDiscId];
@@ -289,11 +314,7 @@ namespace BackgammonClient.Forms
             }
 
             this.selectedSlot = slot;
-
-
-
         }
-
 
         public void enableValidSlot(int slotId)
         {
@@ -301,7 +322,6 @@ namespace BackgammonClient.Forms
             {
                 this.slotsButtons[slotId].Enabled = true;
                 this.slotsButtons[slotId].BackColor = System.Drawing.Color.Gainsboro;
-
             }
         }
 
@@ -315,7 +335,6 @@ namespace BackgammonClient.Forms
             {
                 this.colorPictureBox.BackColor = discsColor[0];
             }
-
             else if (this.color == 2)
             {
                 this.colorPictureBox.BackColor = discsColor[1];
@@ -436,38 +455,6 @@ namespace BackgammonClient.Forms
             if (targetSlot != -1)
                 enableValidSlot(targetSlot);
         }
-        //private void setupBarButtons()
-        //{
-        //    // Add click events to bar buttons
-        //    whiteBarButton.Click += new System.EventHandler(this.BarClick);
-        //    blackBarButton.Click += new System.EventHandler(this.BarClick);
-        //}
-
-        //private void BarClick(object sender, EventArgs e)
-        //{
-        //    // Only allow clicking your own bar
-        //    if ((sender == whiteBarButton && this.color == 1 && whiteOnBar > 0) ||
-        //        (sender == blackBarButton && this.color == 2 && blackOnBar > 0))
-        //    {
-        //        // Disable all slot buttons first
-        //        for (int i = 0; i < slotsButtons.Length; i++)
-        //        {
-        //            slotsButtons[i].Enabled = false;
-        //            slotsButtons[i].BackColor = System.Drawing.Color.Silver;
-        //        }
-
-        //        // Enable valid entry points based on dice
-        //        if (!cube1Used)
-        //        {
-        //            EnableEntryPoint(cube1);
-        //        }
-
-        //        if (!cube2Used)
-        //        {
-        //            EnableEntryPoint(cube2);
-        //        }
-        //    }
-        //}
 
         private void BarDiscClick(object sender, EventArgs e)
         {
@@ -519,17 +506,26 @@ namespace BackgammonClient.Forms
                 enableValidSlot(entryPoint);
             }
         }
+
         private void updateBarDisplay()
         {
             // Update the bar labels
-            whiteBarButton.Text = "W Bar";
-            blackBarButton.Text = "B Bar";
+            //whiteBarButton.Text = "W Bar";
+            //blackBarButton.Text = "B Bar";
 
             // Update white bar disc
             if (whiteOnBar > 0)
             {
                 whiteBarDiscButton.Visible = true;
                 whiteBarDiscButton.Text = whiteOnBar > 1 ? whiteOnBar.ToString() : "";
+
+                // CHANGED: Set background image instead of color
+                whiteBarDiscButton.BackgroundImage = whiteDiscImage;
+                whiteBarDiscButton.BackgroundImageLayout = ImageLayout.Stretch;
+                whiteBarDiscButton.Tag = 1; // Tag as white
+                whiteBarDiscButton.FlatStyle = FlatStyle.Flat;
+                whiteBarDiscButton.FlatAppearance.BorderSize = 0;
+                whiteBarDiscButton.BackColor = Color.Transparent;
 
                 // Only enable if it's this player's turn and they are white
                 whiteBarDiscButton.Enabled = (this.turnLabel.Text == "IT'S YOUR TURN" && this.color == 1);
@@ -545,6 +541,14 @@ namespace BackgammonClient.Forms
             {
                 blackBarDiscButton.Visible = true;
                 blackBarDiscButton.Text = blackOnBar > 1 ? blackOnBar.ToString() : "";
+
+                // CHANGED: Set background image instead of color
+                blackBarDiscButton.BackgroundImage = blackDiscImage;
+                blackBarDiscButton.BackgroundImageLayout = ImageLayout.Stretch;
+                blackBarDiscButton.Tag = 2; // Tag as black
+                blackBarDiscButton.FlatStyle = FlatStyle.Flat;
+                blackBarDiscButton.FlatAppearance.BorderSize = 0;
+                blackBarDiscButton.BackColor = Color.Transparent;
                 blackBarDiscButton.ForeColor = Color.White; // White text on black background
 
                 // Only enable if it's this player's turn and they are black
@@ -556,7 +560,6 @@ namespace BackgammonClient.Forms
                 blackBarDiscButton.Text = "";
             }
         }
-
 
         public void sendState()
         {
@@ -571,8 +574,6 @@ namespace BackgammonClient.Forms
 
             sendMessage("State," + string.Join(";", slotsString) + ";" + barInfo);
         }
-
-
 
         private void rollTheDice_click(object sender, EventArgs e)
         {
@@ -602,9 +603,7 @@ namespace BackgammonClient.Forms
             sendMessage("Dice," + cube1 + "," + cube2);
 
             this.roll.Enabled = false;
-
         }
-
 
         private void doneButton_Click(object sender, EventArgs e)
         {
@@ -639,6 +638,16 @@ namespace BackgammonClient.Forms
                 {
                     x -= 50;
                 }
+                if (i % 2 == 0)
+                {
+                    this.slotsButtons[i].BackgroundImage = redSlotTopImage;
+                    this.slotsButtons[i].BackgroundImageLayout = ImageLayout.Stretch;
+                }
+                else if (i % 2 == 1)
+                {
+                    this.slotsButtons[i].BackgroundImage = whiteSlotTopImage;
+                    this.slotsButtons[i].BackgroundImageLayout = ImageLayout.Stretch;
+                }
                 x -= 50;
             }
         }
@@ -666,56 +675,79 @@ namespace BackgammonClient.Forms
                     x += 50;
                 }
 
+                if (i % 2 == 0)
+                {
+                    this.slotsButtons[i].BackgroundImage = redSlotBottonImage;
+                    this.slotsButtons[i].BackgroundImageLayout = ImageLayout.Stretch;
+                }
+                else if (i % 2 == 1)
+                {
+                    this.slotsButtons[i].BackgroundImage = whiteSlotBottomImage;
+                    this.slotsButtons[i].BackgroundImageLayout = ImageLayout.Stretch;
+                }
+
                 x += 50;
             }
             x = 50;
+
+            
         }
 
         public void placeBars()
         {
             // Create bar buttons
-            whiteBarButton = new Button();
-            whiteBarButton.Location = new System.Drawing.Point(425, 10);
-            whiteBarButton.Name = "whiteBar";
-            whiteBarButton.Size = new System.Drawing.Size(50, 150);
-            whiteBarButton.TabIndex = 40;
-            whiteBarButton.TabStop = false;
-            whiteBarButton.BackColor = System.Drawing.Color.DarkGray;
-            whiteBarButton.Text = "W Bar";
-            whiteBarButton.Enabled = false; // Disable the bar button
-            this.Controls.Add(whiteBarButton);
+            //whiteBarButton = new Button();
+            //whiteBarButton.Location = new System.Drawing.Point(425, 10);
+            //whiteBarButton.Name = "whiteBar";
+            //whiteBarButton.Size = new System.Drawing.Size(50, 150);
+            //whiteBarButton.TabIndex = 40;
+            //whiteBarButton.TabStop = false;
+            //whiteBarButton.BackColor = System.Drawing.Color.DarkGray;
+            //whiteBarButton.Text = "W Bar";
+            //whiteBarButton.Enabled = false; // Disable the bar button
+            //this.Controls.Add(whiteBarButton);
 
-            blackBarButton = new Button();
-            blackBarButton.Location = new System.Drawing.Point(425, 285);
-            blackBarButton.Name = "blackBar";
-            blackBarButton.Size = new System.Drawing.Size(50, 153);
-            blackBarButton.TabIndex = 41;
-            blackBarButton.TabStop = false;
-            blackBarButton.BackColor = System.Drawing.Color.DarkGray;
-            blackBarButton.Text = "B Bar";
-            blackBarButton.Enabled = false; // Disable the bar button
-            this.Controls.Add(blackBarButton);
+            //blackBarButton = new Button();
+            //blackBarButton.Location = new System.Drawing.Point(425, 285);
+            //blackBarButton.Name = "blackBar";
+            //blackBarButton.Size = new System.Drawing.Size(50, 153);
+            //blackBarButton.TabIndex = 41;
+            //blackBarButton.TabStop = false;
+            //blackBarButton.BackColor = System.Drawing.Color.DarkGray;
+            //blackBarButton.Text = "B Bar";
+            //blackBarButton.Enabled = false; // Disable the bar button
+            //this.Controls.Add(blackBarButton);
 
             // Create disc buttons that sit on top of the bar buttons
             whiteBarDiscButton = new Button();
-            whiteBarDiscButton.Location = new System.Drawing.Point(whiteBarButton.Location.X + 10, whiteBarButton.Location.Y + 60); // Center on bar
+            whiteBarDiscButton.Location = new System.Drawing.Point(425 + 10, 110 + 60); // Center on bar
             whiteBarDiscButton.Name = "whiteBarDisc";
             whiteBarDiscButton.Size = new System.Drawing.Size(30, 30); // Same as other disc buttons
             whiteBarDiscButton.TabIndex = 42;
             whiteBarDiscButton.TabStop = false;
-            whiteBarDiscButton.BackColor = discsColor[0]; // White color
+            whiteBarDiscButton.BackgroundImage = whiteDiscImage;
+            whiteBarDiscButton.BackgroundImageLayout = ImageLayout.Stretch;
+            whiteBarDiscButton.Tag = 1; // Tag as white
+            whiteBarDiscButton.FlatStyle = FlatStyle.Flat;
+            whiteBarDiscButton.FlatAppearance.BorderSize = 0;
+            whiteBarDiscButton.BackColor = Color.Transparent;
             whiteBarDiscButton.Visible = false; // Hidden by default
             whiteBarDiscButton.Click += new System.EventHandler(this.BarDiscClick);
             this.Controls.Add(whiteBarDiscButton);
             whiteBarDiscButton.BringToFront();
 
             blackBarDiscButton = new Button();
-            blackBarDiscButton.Location = new System.Drawing.Point(blackBarButton.Location.X + 10, blackBarButton.Location.Y + 60); // Center on bar
+            blackBarDiscButton.Location = new System.Drawing.Point(425 + 10, 185 + 60); // Center on bar
             blackBarDiscButton.Name = "blackBarDisc";
             blackBarDiscButton.Size = new System.Drawing.Size(30, 30); // Same as other disc buttons
             blackBarDiscButton.TabIndex = 43;
             blackBarDiscButton.TabStop = false;
-            blackBarDiscButton.BackColor = discsColor[1]; // Black color
+            blackBarDiscButton.BackgroundImage = blackDiscImage;
+            blackBarDiscButton.BackgroundImageLayout = ImageLayout.Stretch;
+            blackBarDiscButton.Tag = 2; // Tag as black
+            blackBarDiscButton.FlatStyle = FlatStyle.Flat;
+            blackBarDiscButton.FlatAppearance.BorderSize = 0;
+            blackBarDiscButton.BackColor = Color.Transparent;
             blackBarDiscButton.ForeColor = System.Drawing.Color.White;
             blackBarDiscButton.Visible = false; // Hidden by default
             blackBarDiscButton.Click += new System.EventHandler(this.BarDiscClick);
