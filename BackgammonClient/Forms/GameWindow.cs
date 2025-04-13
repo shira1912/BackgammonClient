@@ -238,15 +238,15 @@ namespace BackgammonClient.Forms
                 }
                 else
                 {
-                    // No checkers on bar - enable regular white disc buttons
-                    for (int i = 0; i < this.discsButtons.Length; i++)
-                    {
-                        if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == 1)
-                        {
-                            this.discsButtons[i].Enabled = true;
-                        }
-                    }
-                    this.updatesLabel.Text = "";
+                    //// No checkers on bar - enable regular white disc buttons
+                    //for (int i = 0; i < this.discsButtons.Length; i++)
+                    //{
+                    //    if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == 1)
+                    //    {
+                    //        this.discsButtons[i].Enabled = true;
+                    //    }
+                    //}
+                    //this.updatesLabel.Text = "";
                 }
             }
             // BLACK PLAYER'S TURN
@@ -265,15 +265,15 @@ namespace BackgammonClient.Forms
                 }
                 else
                 {
-                    // No checkers on bar - enable regular black disc buttons
-                    for (int i = 0; i < this.discsButtons.Length; i++)
-                    {
-                        if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == 2)
-                        {
-                            this.discsButtons[i].Enabled = true;
-                        }
-                    }
-                    this.updatesLabel.Text = "";
+                    //// No checkers on bar - enable regular black disc buttons
+                    //for (int i = 0; i < this.discsButtons.Length; i++)
+                    //{
+                    //    if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == 2)
+                    //    {
+                    //        this.discsButtons[i].Enabled = true;
+                    //    }
+                    //}
+                    //this.updatesLabel.Text = "";
                 }
             }
         }
@@ -320,6 +320,7 @@ namespace BackgammonClient.Forms
                 }
 
                 // Process bearing off information if available
+                // Process bearing off information if available
                 infoIndex++;
                 if (stateComponents.Length > infoIndex)
                 {
@@ -329,9 +330,9 @@ namespace BackgammonClient.Forms
                         whiteCheckersOff = Int32.Parse(offInfo[1]);
                         blackCheckersOff = Int32.Parse(offInfo[2]);
 
-                        // Update the UI
-                        whiteOffLabel.Text = whiteCheckersOff.ToString();
-                        blackOffLabel.Text = blackCheckersOff.ToString();
+                        // Update the button text
+                        whiteBearOffButton.Text = "OFF: " + whiteCheckersOff;
+                        blackBearOffButton.Text = "OFF: " + blackCheckersOff;
                     }
                 }
             }
@@ -395,17 +396,18 @@ namespace BackgammonClient.Forms
                     // Check if it's the player's turn and if the disc color matches the player's color
                     bool isTurn = this.turnLabel.Text == "IT'S YOUR TURN";
 
-                    // Don't enable regular discs if there are checkers on the bar
-                    bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) || (this.color == 2 && blackOnBar > 0);
-                    if (playerHasCheckersOnBar)
-                    {
-                        this.discsButtons[counter].Enabled = false;
-                    }
-                    else
-                    {
-                        // Enable only if it's the player's turn and the disc color matches
-                        this.discsButtons[counter].Enabled = isTurn && ((int)this.discsButtons[counter].Tag == this.color);
-                    }
+                    //// Don't enable regular discs if there are checkers on the bar
+                    //bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) || (this.color == 2 && blackOnBar > 0);
+                    //if (playerHasCheckersOnBar)
+                    //{
+                    //    this.discsButtons[counter].Enabled = false;
+                    //}
+                    //else
+                    //{
+                    //    // Enable only if it's the player's turn and the disc color matches
+                    //    this.discsButtons[counter].Enabled = isTurn && ((int)this.discsButtons[counter].Tag == this.color);
+                    //}
+                    this.discsButtons[counter].Enabled = false;
 
                     this.discsButtons[counter].Click += new System.EventHandler(this.showAvailableSlots);
 
@@ -586,6 +588,11 @@ namespace BackgammonClient.Forms
             // Important: Redraw the board to reflect changes
             placeDiscs();
             updateBarDisplay(); // Update bar visualization
+                                // Re-enable discs for remaining moves if we still have moves left
+            if (movesRemaining > 0)
+            {
+                enableDiscs();
+            }
 
             // Check if we still have checkers on the bar and if it's still our turn
             if ((this.color == 1 && whiteOnBar > 0) || (this.color == 2 && blackOnBar > 0))
@@ -685,12 +692,24 @@ namespace BackgammonClient.Forms
             {
                 EnableSlotForDie(slot, cube2);
             }
+            // If we've used all dice or have no more moves, don't bother enabling discs
+            if (movesRemaining <= 0 || (cube1Used && cube2Used))
+                return;
+
+            // Re-enable discs for remaining moves
+            enableDiscs();
         }
 
-        // Helper method to enable a slot based on die value
+        
         private void EnableSlotForDie(int currentSlot, int dieValue)
-        {
+        {// Helper method to enable a slot based on die value
             int targetSlot = -1;
+
+            // Reset bearing off buttons to disabled by default at the start of this method
+            whiteBearOffButton.Enabled = false;
+            whiteBearOffButton.BackColor = System.Drawing.Color.Silver;
+            blackBearOffButton.Enabled = false;
+            blackBearOffButton.BackColor = System.Drawing.Color.Silver;
 
             // Check if the player can bear off
             if (CanBearOff(this.color))
@@ -965,32 +984,28 @@ namespace BackgammonClient.Forms
             bool isWhiteBearingOff = clickedButton == whiteBearOffButton;
 
             int slotId = selectedDisc.getSlotId();
-
             int dieValue;
 
             if (this.color == 1) // white
             {
                 dieValue = slotId + 1; // For white, distance from 0
 
-                // If exact match with cube1, use cube1
+                // Logic for using dice
                 if (dieValue == cube1 && !cube1Used)
                 {
                     cube1Used = true;
                     usedCube = cube1;
                 }
-                // If exact match with cube2, use cube2
                 else if (dieValue == cube2 && !cube2Used)
                 {
                     cube2Used = true;
                     usedCube = cube2;
                 }
-                // If greater than cube1, use cube1
                 else if (dieValue < cube1 && !cube1Used)
                 {
                     cube1Used = true;
                     usedCube = cube1;
                 }
-                // If greater than cube2, use cube2
                 else if (dieValue < cube2 && !cube2Used)
                 {
                     cube2Used = true;
@@ -1002,31 +1017,28 @@ namespace BackgammonClient.Forms
 
                 // Increment the checkers off counter
                 whiteCheckersOff++;
-                whiteOffLabel.Text = whiteCheckersOff.ToString();
+                whiteBearOffButton.Text = "OFF: " + whiteCheckersOff;  // Update the button text
             }
             else // black
             {
                 dieValue = 24 - slotId; // For black, distance from 24
 
-                // If exact match with cube1, use cube1
+                // Logic for using dice
                 if (dieValue == cube1 && !cube1Used)
                 {
                     cube1Used = true;
                     usedCube = cube1;
                 }
-                // If exact match with cube2, use cube2
                 else if (dieValue == cube2 && !cube2Used)
                 {
                     cube2Used = true;
                     usedCube = cube2;
                 }
-                // If greater than cube1, use cube1
                 else if (dieValue < cube1 && !cube1Used)
                 {
                     cube1Used = true;
                     usedCube = cube1;
                 }
-                // If greater than cube2, use cube2
                 else if (dieValue < cube2 && !cube2Used)
                 {
                     cube2Used = true;
@@ -1038,7 +1050,7 @@ namespace BackgammonClient.Forms
 
                 // Increment the checkers off counter
                 blackCheckersOff++;
-                blackOffLabel.Text = blackCheckersOff.ToString();
+                blackBearOffButton.Text = "OFF: " + blackCheckersOff;  // Update the button text
             }
 
             usedCubesAmount++;
@@ -1063,7 +1075,17 @@ namespace BackgammonClient.Forms
 
             // Important: Redraw the board to reflect changes
             placeDiscs();
+            whiteBearOffButton.Enabled = false;
+            whiteBearOffButton.BackColor = System.Drawing.Color.Silver;
+            blackBearOffButton.Enabled = false;
+            blackBearOffButton.BackColor = System.Drawing.Color.Silver;
 
+
+            // Re-enable discs for remaining moves if we still have moves left
+            if (movesRemaining > 0)
+            {
+                enableDiscs();
+            }
             // Disable used cube
             disableUsedCube();
 
@@ -1123,6 +1145,7 @@ namespace BackgammonClient.Forms
 
             if (playerHasCheckersOnBar)
             {
+                
                 bool hasValidMove = false;
 
                 hasValidMove |= CheckValidEntryExists(cube1);
@@ -1137,7 +1160,43 @@ namespace BackgammonClient.Forms
             }
 
             // Update button states after roll
-            disableButtons(true);
+            //disableButtons(true);
+            enableDiscs();
+        }
+
+        public void enableDiscs()
+        {
+            // Check if player has checkers on the bar
+            bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) ||
+                                         (this.color == 2 && blackOnBar > 0);
+
+            if (playerHasCheckersOnBar)
+            {
+                // Player has checkers on the bar, only enable those
+                if (this.color == 1)
+                {
+                    whiteBarDiscButton.Enabled = true;
+                    whiteBarDiscButton.Visible = true;
+                    this.updatesLabel.Text = "You must move your checkers from the bar first!";
+                }
+                else
+                {
+                    blackBarDiscButton.Enabled = true;
+                    blackBarDiscButton.Visible = true;
+                    this.updatesLabel.Text = "You must move your checkers from the bar first!";
+                }
+            }
+            else
+            {
+                // No checkers on the bar, enable regular discs
+                for (int i = 0; i < this.discsButtons.Length; i++)
+                {
+                    if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == this.color)
+                    {
+                        this.discsButtons[i].Enabled = true;
+                    }
+                }
+            }
         }
 
         private void doneButton_Click(object sender, EventArgs e)
@@ -1269,45 +1328,30 @@ namespace BackgammonClient.Forms
         {
             // Set up the bearing off buttons
             whiteBearOffButton = new Button();
-            whiteBearOffButton.Location = new System.Drawing.Point(800, 35); // Position on left side for white
+            whiteBearOffButton.Location = new System.Drawing.Point(800, 35);
             whiteBearOffButton.Name = "whiteBearOff";
             whiteBearOffButton.Size = new System.Drawing.Size(50, 100);
             whiteBearOffButton.TabIndex = 44;
             whiteBearOffButton.TabStop = false;
-            whiteBearOffButton.Text = "BEAR OFF";
+            whiteBearOffButton.Text = "BEAR OFF";  // Show count on button
             whiteBearOffButton.BackColor = System.Drawing.Color.Silver;
             whiteBearOffButton.Enabled = false;
             whiteBearOffButton.Click += new System.EventHandler(this.BearOffClick);
             this.Controls.Add(whiteBearOffButton);
 
             blackBearOffButton = new Button();
-            blackBearOffButton.Location = new System.Drawing.Point(800, 320); // Position on right side for black
+            blackBearOffButton.Location = new System.Drawing.Point(800, 320);
             blackBearOffButton.Name = "blackBearOff";
             blackBearOffButton.Size = new System.Drawing.Size(50, 100);
             blackBearOffButton.TabIndex = 45;
             blackBearOffButton.TabStop = false;
-            blackBearOffButton.Text = "BEAR OFF";
+            blackBearOffButton.Text = "BEAR OFF";  // Show count on button
             blackBearOffButton.BackColor = System.Drawing.Color.Silver;
             blackBearOffButton.Enabled = false;
             blackBearOffButton.Click += new System.EventHandler(this.BearOffClick);
             this.Controls.Add(blackBearOffButton);
 
-            // Set up labels to show count of borne off checkers
-            whiteOffLabel = new Label();
-            whiteOffLabel.Location = new System.Drawing.Point(800, 130);
-            whiteOffLabel.Name = "whiteOffLabel";
-            whiteOffLabel.Size = new System.Drawing.Size(50, 20);
-            whiteOffLabel.Text = "0";
-            whiteOffLabel.TextAlign = ContentAlignment.MiddleCenter;
-            this.Controls.Add(whiteOffLabel);
-
-            blackOffLabel = new Label();
-            blackOffLabel.Location = new System.Drawing.Point(800, 180);
-            blackOffLabel.Name = "blackOffLabel";
-            blackOffLabel.Size = new System.Drawing.Size(50, 20);
-            blackOffLabel.Text = "0";
-            blackOffLabel.TextAlign = ContentAlignment.MiddleCenter;
-            this.Controls.Add(blackOffLabel);
+            
         }
 
         public void setCubePicture(int cube, int cubeNum)
@@ -1422,8 +1466,8 @@ namespace BackgammonClient.Forms
             blackCheckersOff = 0;
 
             // Update labels
-            whiteOffLabel.Text = "0";
-            blackOffLabel.Text = "0";
+            whiteBearOffButton.Text = "BEAR OFF";
+            blackBearOffButton.Text = "BEAR OFF";
 
             // Distribute white checkers in their home board (points 0-5)
             slots[0] = new Slot(3, 1); // 3 white checkers on point 0
