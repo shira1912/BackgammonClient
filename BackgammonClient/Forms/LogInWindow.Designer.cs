@@ -83,22 +83,24 @@
             // label1
             // 
             label1.AutoSize = true;
+            label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             label1.ForeColor = System.Drawing.Color.SaddleBrown;
-            label1.Location = new System.Drawing.Point(116, 119);
+            label1.Location = new System.Drawing.Point(117, 119);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(59, 15);
+            label1.Size = new System.Drawing.Size(71, 15);
             label1.TabIndex = 4;
-            label1.Text = "username";
+            label1.Text = "USERNAME";
             // 
             // label2
             // 
             label2.AutoSize = true;
+            label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             label2.ForeColor = System.Drawing.Color.SaddleBrown;
-            label2.Location = new System.Drawing.Point(116, 154);
+            label2.Location = new System.Drawing.Point(117, 157);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(57, 15);
+            label2.Size = new System.Drawing.Size(73, 15);
             label2.TabIndex = 5;
-            label2.Text = "password";
+            label2.Text = "PASSWORD";
             // 
             // SkipButton
             // 

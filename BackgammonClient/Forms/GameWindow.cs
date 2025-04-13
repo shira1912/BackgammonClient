@@ -67,6 +67,18 @@ namespace BackgammonClient.Forms
         private Image redSlotBottonImage;
         private Image whiteSlotBottomImage;
 
+        // Add these properties to track the checkers that have been borne off
+        private int whiteCheckersOff = 0;
+        private int blackCheckersOff = 0;
+
+        // Add UI elements to display the number of checkers borne off
+        private Label whiteOffLabel;
+        private Label blackOffLabel;
+
+        // Add a button to represent the bearing off area
+        private Button whiteBearOffButton;
+        private Button blackBearOffButton;
+
         // Flag to track if we're moving from the bar
         private bool movingFromBar = false;
 
@@ -93,6 +105,7 @@ namespace BackgammonClient.Forms
             initialSlots();
             placeDiscs();
             updateBarDisplay();
+            SetupBearingOff();
             initalTurn(color == 1);
         }
 
@@ -295,14 +308,31 @@ namespace BackgammonClient.Forms
             }
 
             // Process bar information if available
-            if (stateComponents.Length > slots.Length)
+            int infoIndex = slots.Length;
+            if (stateComponents.Length > infoIndex)
             {
-                string[] barInfo = stateComponents[slots.Length].Split(':');
+                string[] barInfo = stateComponents[infoIndex].Split(':');
                 if (barInfo[0] == "bar" && barInfo.Length == 3)
                 {
                     whiteOnBar = Int32.Parse(barInfo[1]);
                     blackOnBar = Int32.Parse(barInfo[2]);
                     updateBarDisplay();
+                }
+
+                // Process bearing off information if available
+                infoIndex++;
+                if (stateComponents.Length > infoIndex)
+                {
+                    string[] offInfo = stateComponents[infoIndex].Split(':');
+                    if (offInfo[0] == "off" && offInfo.Length == 3)
+                    {
+                        whiteCheckersOff = Int32.Parse(offInfo[1]);
+                        blackCheckersOff = Int32.Parse(offInfo[2]);
+
+                        // Update the UI
+                        whiteOffLabel.Text = whiteCheckersOff.ToString();
+                        blackOffLabel.Text = blackCheckersOff.ToString();
+                    }
                 }
             }
 
@@ -662,15 +692,111 @@ namespace BackgammonClient.Forms
         {
             int targetSlot = -1;
 
-            if (this.color == 1) // white
+            // Check if the player can bear off
+            if (CanBearOff(this.color))
             {
-                if (currentSlot - dieValue >= 0)
-                    targetSlot = currentSlot - dieValue;
+                // For bearing off, we need to enable the bearing off "button"
+                // For white (color 1), moving down from slots 0-5
+                // For black (color 2), moving up from slots 18-23
+
+                if (this.color == 1) // white
+                {
+                    // White bears off by going "below" slot 0
+                    if (currentSlot - dieValue < 0)
+                    {
+                        // Enable bearing off only if:
+                        // 1. The die value exactly matches the distance (e.g., checker on point 3 with die value 3)
+                        // 2. OR, the die value is greater than the distance AND there are no checkers further away
+
+                        bool canBearOff = false;
+                        if (currentSlot + 1 == dieValue) // Exact match
+                        {
+                            canBearOff = true;
+                        }
+                        else if (currentSlot + 1 < dieValue) // Die is larger than needed
+                        {
+                            // Check if there are no checkers on higher points
+                            bool hasHigherCheckers = false;
+                            for (int i = currentSlot + 1; i <= 5; i++)
+                            {
+                                if (slots[i].getColor() == this.color && slots[i].getQuantity() > 0)
+                                {
+                                    hasHigherCheckers = true;
+                                    break;
+                                }
+                            }
+                            canBearOff = !hasHigherCheckers;
+                        }
+
+                        if (canBearOff)
+                        {
+                            // Enable the bearing off "button" for white
+                            whiteBearOffButton.Enabled = true;
+                            whiteBearOffButton.BackColor = System.Drawing.Color.Gainsboro;
+                            return;
+                        }
+                    }
+
+                    // Regular move
+                    if (currentSlot - dieValue >= 0)
+                        targetSlot = currentSlot - dieValue;
+                }
+                else // black
+                {
+                    // Black bears off by going "above" slot 23
+                    if (currentSlot + dieValue > 23)
+                    {
+                        // Enable bearing off only if:
+                        // 1. The die value exactly matches the distance (e.g., checker on point 21 with die value 3)
+                        // 2. OR, the die value is greater than the distance AND there are no checkers further away
+
+                        bool canBearOff = false;
+                        if (24 - currentSlot == dieValue) // Exact match
+                        {
+                            canBearOff = true;
+                        }
+                        else if (24 - currentSlot < dieValue) // Die is larger than needed
+                        {
+                            // Check if there are no checkers on lower points
+                            bool hasLowerCheckers = false;
+                            for (int i = 18; i < currentSlot; i++)
+                            {
+                                if (slots[i].getColor() == this.color && slots[i].getQuantity() > 0)
+                                {
+                                    hasLowerCheckers = true;
+                                    break;
+                                }
+                            }
+                            canBearOff = !hasLowerCheckers;
+                        }
+
+                        if (canBearOff)
+                        {
+                            // Enable the bearing off "button" for black
+                            blackBearOffButton.Enabled = true;
+                            blackBearOffButton.BackColor = System.Drawing.Color.Gainsboro;
+                            return;
+                        }
+                    }
+
+                    // Regular move
+                    if (currentSlot + dieValue < slotsButtons.Length)
+                        targetSlot = currentSlot + dieValue;
+                }
             }
-            else // black
+            else
             {
-                if (currentSlot + dieValue < slotsButtons.Length)
-                    targetSlot = currentSlot + dieValue;
+                // Regular move logic (no bearing off)
+                if (this.color == 1) // white
+                {
+                    if (currentSlot - dieValue >= 0)
+                        targetSlot = currentSlot - dieValue;
+                }
+                else // black
+                {
+                    if (currentSlot + dieValue < slotsButtons.Length)
+                        targetSlot = currentSlot + dieValue;
+                }
             }
 
             if (targetSlot != -1)
@@ -802,7 +928,148 @@ namespace BackgammonClient.Forms
                 blackBarDiscButton.Text = "";
             }
         }
+        private bool CanBearOff(int playerColor)
+        {
+            // Check if any checkers are on bar
+            if ((playerColor == 1 && whiteOnBar > 0) || (playerColor == 2 && blackOnBar > 0))
+                return false;
 
+            // Define home board range for each player
+            int startSlot = (playerColor == 1) ? 0 : 18;
+            int endSlot = (playerColor == 1) ? 5 : 23;
+
+            // Check if all checkers are in the home board
+            for (int i = 0; i < slots.Length; i++)
+            {
+                // If there's a checker of the player's color outside the home board, can't bear off
+                if (slots[i].getColor() == playerColor && slots[i].getQuantity() > 0)
+                {
+                    if (i < startSlot || i > endSlot)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void BearOffClick(object sender, EventArgs e)
+        {
+            // null check
+            if (selectedDisc == null)
+            {
+                this.updatesLabel.Text = "Please select a checker to bear off first.";
+                return;
+            }
+
+            Button clickedButton = (Button)sender;
+            bool isWhiteBearingOff = clickedButton == whiteBearOffButton;
+
+            int slotId = selectedDisc.getSlotId();
+
+            int dieValue;
+
+            if (this.color == 1) // white
+            {
+                dieValue = slotId + 1; // For white, distance from 0
+
+                // If exact match with cube1, use cube1
+                if (dieValue == cube1 && !cube1Used)
+                {
+                    cube1Used = true;
+                    usedCube = cube1;
+                }
+                // If exact match with cube2, use cube2
+                else if (dieValue == cube2 && !cube2Used)
+                {
+                    cube2Used = true;
+                    usedCube = cube2;
+                }
+                // If greater than cube1, use cube1
+                else if (dieValue < cube1 && !cube1Used)
+                {
+                    cube1Used = true;
+                    usedCube = cube1;
+                }
+                // If greater than cube2, use cube2
+                else if (dieValue < cube2 && !cube2Used)
+                {
+                    cube2Used = true;
+                    usedCube = cube2;
+                }
+
+                // Remove the checker from the slot
+                slots[slotId].setQuantity(slots[slotId].getQuantity() - 1);
+
+                // Increment the checkers off counter
+                whiteCheckersOff++;
+                whiteOffLabel.Text = whiteCheckersOff.ToString();
+            }
+            else // black
+            {
+                dieValue = 24 - slotId; // For black, distance from 24
+
+                // If exact match with cube1, use cube1
+                if (dieValue == cube1 && !cube1Used)
+                {
+                    cube1Used = true;
+                    usedCube = cube1;
+                }
+                // If exact match with cube2, use cube2
+                else if (dieValue == cube2 && !cube2Used)
+                {
+                    cube2Used = true;
+                    usedCube = cube2;
+                }
+                // If greater than cube1, use cube1
+                else if (dieValue < cube1 && !cube1Used)
+                {
+                    cube1Used = true;
+                    usedCube = cube1;
+                }
+                // If greater than cube2, use cube2
+                else if (dieValue < cube2 && !cube2Used)
+                {
+                    cube2Used = true;
+                    usedCube = cube2;
+                }
+
+                // Remove the checker from the slot
+                slots[slotId].setQuantity(slots[slotId].getQuantity() - 1);
+
+                // Increment the checkers off counter
+                blackCheckersOff++;
+                blackOffLabel.Text = blackCheckersOff.ToString();
+            }
+
+            usedCubesAmount++;
+            movesRemaining--;
+
+            // Reset selection
+            selectedDisc = null;
+
+            // Check if we've won
+            if ((this.color == 1 && whiteCheckersOff == 15) || (this.color == 2 && blackCheckersOff == 15))
+            {
+                // Game over, player has won
+                this.updatesLabel.Text = "Game Over! You have borne off all your checkers!";
+                // Disable further moves
+                roll.Enabled = false;
+                doneButton.Enabled = false;
+            }
+            else if (movesRemaining <= 0)
+            {
+                this.OnSwitchTurn?.Invoke();
+            }
+
+            // Important: Redraw the board to reflect changes
+            placeDiscs();
+
+            // Disable used cube
+            disableUsedCube();
+
+            // Send the state update
+            sendState();
+        }
         public void sendState()
         {
             string[] slotsString = new string[slots.Length];
@@ -814,7 +1081,10 @@ namespace BackgammonClient.Forms
             // Add bar information to the state
             string barInfo = "bar:" + whiteOnBar + ":" + blackOnBar;
 
-            sendMessage("State," + string.Join(";", slotsString) + ";" + barInfo);
+            // Add bearing off information
+            string bearOffInfo = "off:" + whiteCheckersOff + ":" + blackCheckersOff;
+
+            sendMessage("State," + string.Join(";", slotsString) + ";" + barInfo + ";" + bearOffInfo);
         }
 
         private void rollTheDice_click(object sender, EventArgs e)
@@ -993,6 +1263,51 @@ namespace BackgammonClient.Forms
             blackBarDiscButton.Click += new System.EventHandler(this.BarDiscClick);
             this.Controls.Add(blackBarDiscButton);
             blackBarDiscButton.BringToFront();
+        }
+
+        private void SetupBearingOff()
+        {
+            // Set up the bearing off buttons
+            whiteBearOffButton = new Button();
+            whiteBearOffButton.Location = new System.Drawing.Point(800, 60); // Position on left side for white
+            whiteBearOffButton.Name = "whiteBearOff";
+            whiteBearOffButton.Size = new System.Drawing.Size(50, 100);
+            whiteBearOffButton.TabIndex = 44;
+            whiteBearOffButton.TabStop = false;
+            whiteBearOffButton.Text = "BEAR OFF";
+            whiteBearOffButton.BackColor = System.Drawing.Color.Silver;
+            whiteBearOffButton.Enabled = false;
+            whiteBearOffButton.Click += new System.EventHandler(this.BearOffClick);
+            this.Controls.Add(whiteBearOffButton);
+
+            blackBearOffButton = new Button();
+            blackBearOffButton.Location = new System.Drawing.Point(800, 345); // Position on right side for black
+            blackBearOffButton.Name = "blackBearOff";
+            blackBearOffButton.Size = new System.Drawing.Size(50, 100);
+            blackBearOffButton.TabIndex = 45;
+            blackBearOffButton.TabStop = false;
+            blackBearOffButton.Text = "BEAR OFF";
+            blackBearOffButton.BackColor = System.Drawing.Color.Silver;
+            blackBearOffButton.Enabled = false;
+            blackBearOffButton.Click += new System.EventHandler(this.BearOffClick);
+            this.Controls.Add(blackBearOffButton);
+
+            // Set up labels to show count of borne off checkers
+            whiteOffLabel = new Label();
+            whiteOffLabel.Location = new System.Drawing.Point(50, 225);
+            whiteOffLabel.Name = "whiteOffLabel";
+            whiteOffLabel.Size = new System.Drawing.Size(50, 20);
+            whiteOffLabel.Text = "0";
+            whiteOffLabel.TextAlign = ContentAlignment.MiddleCenter;
+            this.Controls.Add(whiteOffLabel);
+
+            blackOffLabel = new Label();
+            blackOffLabel.Location = new System.Drawing.Point(800, 375);
+            blackOffLabel.Name = "blackOffLabel";
+            blackOffLabel.Size = new System.Drawing.Size(50, 20);
+            blackOffLabel.Text = "0";
+            blackOffLabel.TextAlign = ContentAlignment.MiddleCenter;
+            this.Controls.Add(blackOffLabel);
         }
 
         public void setCubePicture(int cube, int cubeNum)

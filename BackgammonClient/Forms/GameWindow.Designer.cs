@@ -37,6 +37,7 @@
             youLabel = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             updatesLabel = new System.Windows.Forms.Label();
+            skipToBearingButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)colorPictureBox).BeginInit();
@@ -139,12 +140,23 @@
             updatesLabel.Size = new System.Drawing.Size(112, 50);
             updatesLabel.TabIndex = 11;
             // 
+            // skipToBearingButton
+            // 
+            skipToBearingButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            skipToBearingButton.Location = new System.Drawing.Point(23, 409);
+            skipToBearingButton.Name = "skipToBearingButton";
+            skipToBearingButton.Size = new System.Drawing.Size(91, 40);
+            skipToBearingButton.TabIndex = 12;
+            skipToBearingButton.Text = "SKIP TO BEARING OFF";
+            skipToBearingButton.UseVisualStyleBackColor = true;
+            // 
             // GameWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.Tan;
             ClientSize = new System.Drawing.Size(984, 461);
+            Controls.Add(skipToBearingButton);
             Controls.Add(updatesLabel);
             Controls.Add(label3);
             Controls.Add(youLabel);
@@ -175,5 +187,6 @@
         private System.Windows.Forms.Label youLabel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label updatesLabel;
+        private System.Windows.Forms.Button skipToBearingButton;
     }
 }
