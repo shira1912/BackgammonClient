@@ -149,6 +149,7 @@
             skipToBearingButton.TabIndex = 12;
             skipToBearingButton.Text = "SKIP TO BEARING OFF";
             skipToBearingButton.UseVisualStyleBackColor = true;
+            skipToBearingButton.Click += skipToBearingButton_Click;
             // 
             // GameWindow
             // 

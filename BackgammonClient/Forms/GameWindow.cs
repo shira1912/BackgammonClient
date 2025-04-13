@@ -274,7 +274,7 @@ namespace BackgammonClient.Forms
                         }
                     }
                     this.updatesLabel.Text = "";
-                }            
+                }
             }
         }
 
@@ -1269,7 +1269,7 @@ namespace BackgammonClient.Forms
         {
             // Set up the bearing off buttons
             whiteBearOffButton = new Button();
-            whiteBearOffButton.Location = new System.Drawing.Point(800, 60); // Position on left side for white
+            whiteBearOffButton.Location = new System.Drawing.Point(800, 35); // Position on left side for white
             whiteBearOffButton.Name = "whiteBearOff";
             whiteBearOffButton.Size = new System.Drawing.Size(50, 100);
             whiteBearOffButton.TabIndex = 44;
@@ -1281,7 +1281,7 @@ namespace BackgammonClient.Forms
             this.Controls.Add(whiteBearOffButton);
 
             blackBearOffButton = new Button();
-            blackBearOffButton.Location = new System.Drawing.Point(800, 345); // Position on right side for black
+            blackBearOffButton.Location = new System.Drawing.Point(800, 320); // Position on right side for black
             blackBearOffButton.Name = "blackBearOff";
             blackBearOffButton.Size = new System.Drawing.Size(50, 100);
             blackBearOffButton.TabIndex = 45;
@@ -1294,7 +1294,7 @@ namespace BackgammonClient.Forms
 
             // Set up labels to show count of borne off checkers
             whiteOffLabel = new Label();
-            whiteOffLabel.Location = new System.Drawing.Point(50, 225);
+            whiteOffLabel.Location = new System.Drawing.Point(800, 130);
             whiteOffLabel.Name = "whiteOffLabel";
             whiteOffLabel.Size = new System.Drawing.Size(50, 20);
             whiteOffLabel.Text = "0";
@@ -1302,7 +1302,7 @@ namespace BackgammonClient.Forms
             this.Controls.Add(whiteOffLabel);
 
             blackOffLabel = new Label();
-            blackOffLabel.Location = new System.Drawing.Point(800, 375);
+            blackOffLabel.Location = new System.Drawing.Point(800, 180);
             blackOffLabel.Name = "blackOffLabel";
             blackOffLabel.Size = new System.Drawing.Size(50, 20);
             blackOffLabel.Text = "0";
@@ -1403,6 +1403,53 @@ namespace BackgammonClient.Forms
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void skipToBearingButton_Click(object sender, EventArgs e)
+        {
+            // Clear the current board state
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slots[i] = new Slot(0, 0);
+            }
+
+            // Clear any checkers on the bar
+            whiteOnBar = 0;
+            blackOnBar = 0;
+
+            // Reset checkers that are already borne off
+            whiteCheckersOff = 0;
+            blackCheckersOff = 0;
+
+            // Update labels
+            whiteOffLabel.Text = "0";
+            blackOffLabel.Text = "0";
+
+            // Distribute white checkers in their home board (points 0-5)
+            slots[0] = new Slot(3, 1); // 3 white checkers on point 0
+            slots[1] = new Slot(3, 1); // 3 white checkers on point 1
+            slots[2] = new Slot(3, 1); // 3 white checkers on point 2
+            slots[3] = new Slot(2, 1); // 2 white checkers on point 3
+            slots[4] = new Slot(2, 1); // 2 white checkers on point 4
+            slots[5] = new Slot(2, 1); // 2 white checkers on point 5
+
+            // Distribute black checkers in their home board (points 18-23)
+            slots[18] = new Slot(3, 2); // 3 black checkers on point 18
+            slots[19] = new Slot(3, 2); // 3 black checkers on point 19
+            slots[20] = new Slot(3, 2); // 3 black checkers on point 20
+            slots[21] = new Slot(2, 2); // 2 black checkers on point 21
+            slots[22] = new Slot(2, 2); // 2 black checkers on point 22
+            slots[23] = new Slot(2, 2); // 2 black checkers on point 23
+
+            // Redraw the board
+            placeDiscs();
+            updateBarDisplay();
+
+            // Send the updated state to the opponent
+            sendState();
+
+            // Update the display message
+            this.updatesLabel.Text = "Board set up for bearing off. All checkers are in their home boards.";
         }
     }
 }
