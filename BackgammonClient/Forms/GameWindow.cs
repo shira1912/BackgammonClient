@@ -418,6 +418,11 @@ namespace BackgammonClient.Forms
                     counter++;
                 }
             }
+            // Explicitly re-enable discs if there are moves remaining
+            if (movesRemaining > 0)
+            {
+                UpdateDiscsState();
+            }
         }
 
         public void showAvailableSlots(object sender, EventArgs e)
@@ -587,11 +592,16 @@ namespace BackgammonClient.Forms
 
             // Important: Redraw the board to reflect changes
             placeDiscs();
+            // Explicitly re-enable discs if there are moves remaining
+            if (movesRemaining > 0)
+            {
+                UpdateDiscsState();
+            }
             updateBarDisplay(); // Update bar visualization
                                 // Re-enable discs for remaining moves if we still have moves left
             if (movesRemaining > 0)
             {
-                enableDiscs();
+                UpdateDiscsState();
             }
 
             // Check if we still have checkers on the bar and if it's still our turn
@@ -677,30 +687,32 @@ namespace BackgammonClient.Forms
                 return;
             }
 
-            // If no dice are used yet or no disc is selected, exit
-            if (selectedDisc == null) return;
-
-            int slot = selectedDisc.getSlotId();
-
-            // Check which die is still available and enable appropriate slots
-            if (!cube1Used)
+            // If a disc is selected, handle slot enabling
+            if (selectedDisc != null)
             {
-                EnableSlotForDie(slot, cube1);
+                int slot = selectedDisc.getSlotId();
+
+                // Check which die is still available and enable appropriate slots
+                if (!cube1Used)
+                {
+                    EnableSlotForDie(slot, cube1);
+                }
+
+                if (!cube2Used)
+                {
+                    EnableSlotForDie(slot, cube2);
+                }
             }
 
-            if (!cube2Used)
-            {
-                EnableSlotForDie(slot, cube2);
-            }
             // If we've used all dice or have no more moves, don't bother enabling discs
             if (movesRemaining <= 0 || (cube1Used && cube2Used))
                 return;
 
             // Re-enable discs for remaining moves
-            enableDiscs();
+            UpdateDiscsState();
         }
 
-        
+
         private void EnableSlotForDie(int currentSlot, int dieValue)
         {// Helper method to enable a slot based on die value
             int targetSlot = -1;
@@ -1084,7 +1096,7 @@ namespace BackgammonClient.Forms
             // Re-enable discs for remaining moves if we still have moves left
             if (movesRemaining > 0)
             {
-                enableDiscs();
+                UpdateDiscsState();
             }
             // Disable used cube
             disableUsedCube();
@@ -1145,7 +1157,7 @@ namespace BackgammonClient.Forms
 
             if (playerHasCheckersOnBar)
             {
-                
+
                 bool hasValidMove = false;
 
                 hasValidMove |= CheckValidEntryExists(cube1);
@@ -1161,43 +1173,122 @@ namespace BackgammonClient.Forms
 
             // Update button states after roll
             //disableButtons(true);
-            enableDiscs();
+            UpdateDiscsState();
         }
 
         public void enableDiscs()
         {
-            // Check if player has checkers on the bar
+            bool isMyTurn = this.turnLabel.Text == "IT'S YOUR TURN";
+            bool diceRolled = cube1 != 0 && cube2 != 0;
             bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) ||
                                          (this.color == 2 && blackOnBar > 0);
 
+            // Step 1: Always start by disabling ALL disc buttons
+            for (int i = 0; i < this.discsButtons.Length; i++)
+            {
+                if (discsButtons[i] != null)
+                {
+                    this.discsButtons[i].Enabled = false;
+                }
+            }
+
+            // Disable bar disc buttons by default
+            whiteBarDiscButton.Enabled = false;
+            blackBarDiscButton.Enabled = false;
+
+            // If it's not player's turn or dice haven't been rolled, all discs remain disabled
+            if (!isMyTurn || !diceRolled)
+                return;
+
+            // If player has checkers on the bar, ONLY enable those
             if (playerHasCheckersOnBar)
             {
-                // Player has checkers on the bar, only enable those
-                if (this.color == 1)
+                if (this.color == 1) // White player
                 {
                     whiteBarDiscButton.Enabled = true;
                     whiteBarDiscButton.Visible = true;
                     this.updatesLabel.Text = "You must move your checkers from the bar first!";
                 }
-                else
+                else // Black player
                 {
                     blackBarDiscButton.Enabled = true;
                     blackBarDiscButton.Visible = true;
                     this.updatesLabel.Text = "You must move your checkers from the bar first!";
                 }
+                return;
             }
-            else
+
+            // If conditions are met, enable regular discs of player's color
+            for (int i = 0; i < this.discsButtons.Length; i++)
             {
-                // No checkers on the bar, enable regular discs
-                for (int i = 0; i < this.discsButtons.Length; i++)
+                if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == this.color)
                 {
-                    if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == this.color)
-                    {
-                        this.discsButtons[i].Enabled = true;
-                    }
+                    this.discsButtons[i].Enabled = true;
                 }
             }
         }
+        // This is the main function that will handle all disc enabling/disabling
+        public void UpdateDiscsState()
+        {
+            bool isMyTurn = this.turnLabel.Text == "IT'S YOUR TURN";
+            bool diceRolled = cube1 != 0 && cube2 != 0; // Dice have been rolled when they have values
+            bool playerHasCheckersOnBar = (this.color == 1 && whiteOnBar > 0) || (this.color == 2 && blackOnBar > 0);
+
+            // Step 1: Always start by disabling ALL disc buttons
+            for (int i = 0; i < this.discsButtons.Length; i++)
+            {
+                if (discsButtons[i] != null)
+                {
+                    this.discsButtons[i].Enabled = false;
+                }
+            }
+
+            // Disable bar disc buttons by default
+            whiteBarDiscButton.Enabled = false;
+            blackBarDiscButton.Enabled = false;
+
+            //// Disable bearing off buttons by default
+            //whiteBearOffButton.Enabled = false;
+            //whiteBearOffButton.BackColor = System.Drawing.Color.Silver;
+            //blackBearOffButton.Enabled = false;
+            //blackBearOffButton.BackColor = System.Drawing.Color.Silver;
+
+            // Step 2: If it's not my turn, all discs remain disabled
+            if (!isMyTurn)
+                return;
+
+            // Step 3: If dice haven't been rolled yet, all discs remain disabled
+            if (!diceRolled)
+                return;
+
+            // Step 4: If player has checkers on the bar, ONLY enable those
+            if (playerHasCheckersOnBar)
+            {
+                if (this.color == 1) // White player
+                {
+                    whiteBarDiscButton.Enabled = true;
+                    whiteBarDiscButton.Visible = true;
+                    this.updatesLabel.Text = "You must move your checkers from the bar first!";
+                }
+                else // Black player
+                {
+                    blackBarDiscButton.Enabled = true;
+                    blackBarDiscButton.Visible = true;
+                    this.updatesLabel.Text = "You must move your checkers from the bar first!";
+                }
+                return;
+            }
+
+            // Step 5: If conditions 1-4 are met, enable regular discs of player's color
+            for (int i = 0; i < this.discsButtons.Length; i++)
+            {
+                if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == this.color)
+                {
+                    this.discsButtons[i].Enabled = true;
+                }
+            }
+        }
+
 
         private void doneButton_Click(object sender, EventArgs e)
         {
@@ -1351,7 +1442,7 @@ namespace BackgammonClient.Forms
             blackBearOffButton.Click += new System.EventHandler(this.BearOffClick);
             this.Controls.Add(blackBearOffButton);
 
-            
+
         }
 
         public void setCubePicture(int cube, int cubeNum)
