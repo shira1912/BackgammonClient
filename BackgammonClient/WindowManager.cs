@@ -160,6 +160,17 @@ namespace BackgammonClient
                         }));
                         break;
                     }
+                case "Win":
+                    {
+                        this._GameWindow.BeginInvoke(new Action(() =>
+                        {
+                            int playerID = int.Parse(splitMessage[1]);
+
+                            this._GameWindow.winHandling(playerID);
+                            
+                        }));
+                    }
+                    break;
 
                 default:
                     {

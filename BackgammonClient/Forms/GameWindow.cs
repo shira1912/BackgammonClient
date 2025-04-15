@@ -83,6 +83,7 @@ namespace BackgammonClient.Forms
         private bool movingFromBar = false;
 
         public event Action OnSwitchTurn;
+        // public event Action Onwin;
         public event Action<string> sendMessage;
         private Color[] discsColor = [System.Drawing.SystemColors.ButtonHighlight, System.Drawing.SystemColors.ActiveCaptionText];
 
@@ -702,20 +703,46 @@ namespace BackgammonClient.Forms
                 {
                     EnableSlotForDie(slot, cube2);
                 }
+
+
+                // For doubles, enable slots based on remaining moves
+                bool hasDoubles = cube1 == cube2 && cube1 > 0;
+                if (hasDoubles && movesRemaining > 0)
+                {
+                    // With doubles, always use the same die value for all moves
+                    EnableSlotForDie(slot, cube1); // or cube2, they're the same
+                }
+                else
+                {
+                    // Check which die is still available and enable appropriate slots
+                    if (!cube1Used)
+                    {
+                        EnableSlotForDie(slot, cube1);
+                    }
+                    if (!cube2Used)
+                    {
+                        EnableSlotForDie(slot, cube2);
+                    }
+                }
+
+
+                // If we've used all dice or have no more moves, don't bother enabling discs
+                if (movesRemaining <= 0 || (cube1Used && cube2Used))
+                    return;
+
+                // Re-enable discs for remaining moves
+                UpdateDiscsState();
             }
-
-            // If we've used all dice or have no more moves, don't bother enabling discs
-            if (movesRemaining <= 0 || (cube1Used && cube2Used))
-                return;
-
-            // Re-enable discs for remaining moves
-            UpdateDiscsState();
         }
-
 
         private void EnableSlotForDie(int currentSlot, int dieValue)
         {// Helper method to enable a slot based on die value
             int targetSlot = -1;
+
+            // Special handling for doubles - enable slots even if dice are "used"
+            // but we still have moves remaining
+            bool hasDoubles = cube1 == cube2 && cube1 > 0;
+            bool canUseDoubles = hasDoubles && movesRemaining > 0;
 
             // Reset bearing off buttons to disabled by default at the start of this method
             whiteBearOffButton.Enabled = false;
@@ -759,7 +786,7 @@ namespace BackgammonClient.Forms
                             canBearOff = !hasHigherCheckers;
                         }
 
-                        if (canBearOff)
+                        if (canBearOff && (canUseDoubles || (!cube1Used && dieValue == cube1) || (!cube2Used && dieValue == cube2)))
                         {
                             // Enable the bearing off "button" for white
                             whiteBearOffButton.Enabled = true;
@@ -801,7 +828,7 @@ namespace BackgammonClient.Forms
                             canBearOff = !hasLowerCheckers;
                         }
 
-                        if (canBearOff)
+                        if (canBearOff && (canUseDoubles || (!cube1Used && dieValue == cube1) || (!cube2Used && dieValue == cube2)))
                         {
                             // Enable the bearing off "button" for black
                             blackBearOffButton.Enabled = true;
@@ -1003,25 +1030,48 @@ namespace BackgammonClient.Forms
                 dieValue = slotId + 1; // For white, distance from 0
 
                 // Logic for using dice
-                if (dieValue == cube1 && !cube1Used)
+                // New logic for dice usage that handles doubles
+                if (cube1 == cube2) // We have doubles
                 {
-                    cube1Used = true;
-                    usedCube = cube1;
+                    // For doubles, we can use the same value up to 4 times
+                    // So we'll just decrement movesRemaining and not mark dice as used
+                    // until all moves are used
+                    if (movesRemaining > 2)
+                    {
+                        // First two moves - don't mark any die as used
+                    }
+                    else if (movesRemaining == 2)
+                    {
+                        cube1Used = true; // Mark first die as used after 2 moves
+                    }
+                    else if (movesRemaining == 1)
+                    {
+                        cube2Used = true; // Mark second die as used after 3 moves
+                    }
                 }
-                else if (dieValue == cube2 && !cube2Used)
+                else // Regular non-doubles roll
                 {
-                    cube2Used = true;
-                    usedCube = cube2;
-                }
-                else if (dieValue < cube1 && !cube1Used)
-                {
-                    cube1Used = true;
-                    usedCube = cube1;
-                }
-                else if (dieValue < cube2 && !cube2Used)
-                {
-                    cube2Used = true;
-                    usedCube = cube2;
+                    // Original logic for using dice
+                    if (dieValue == cube1 && !cube1Used)
+                    {
+                        cube1Used = true;
+                        usedCube = cube1;
+                    }
+                    else if (dieValue == cube2 && !cube2Used)
+                    {
+                        cube2Used = true;
+                        usedCube = cube2;
+                    }
+                    else if (dieValue < cube1 && !cube1Used)
+                    {
+                        cube1Used = true;
+                        usedCube = cube1;
+                    }
+                    else if (dieValue < cube2 && !cube2Used)
+                    {
+                        cube2Used = true;
+                        usedCube = cube2;
+                    }
                 }
 
                 // Remove the checker from the slot
@@ -1035,26 +1085,48 @@ namespace BackgammonClient.Forms
             {
                 dieValue = 24 - slotId; // For black, distance from 24
 
-                // Logic for using dice
-                if (dieValue == cube1 && !cube1Used)
+                // New logic for dice usage that handles doubles
+                if (cube1 == cube2) // We have doubles
                 {
-                    cube1Used = true;
-                    usedCube = cube1;
+                    // For doubles, we can use the same value up to 4 times
+                    // So we'll just decrement movesRemaining and not mark dice as used
+                    // until all moves are used
+                    if (movesRemaining > 2)
+                    {
+                        // First two moves - don't mark any die as used
+                    }
+                    else if (movesRemaining == 2)
+                    {
+                        cube1Used = true; // Mark first die as used after 2 moves
+                    }
+                    else if (movesRemaining == 1)
+                    {
+                        cube2Used = true; // Mark second die as used after 3 moves
+                    }
                 }
-                else if (dieValue == cube2 && !cube2Used)
+                else // Regular non-doubles roll
                 {
-                    cube2Used = true;
-                    usedCube = cube2;
-                }
-                else if (dieValue < cube1 && !cube1Used)
-                {
-                    cube1Used = true;
-                    usedCube = cube1;
-                }
-                else if (dieValue < cube2 && !cube2Used)
-                {
-                    cube2Used = true;
-                    usedCube = cube2;
+                    // Original logic for using dice
+                    if (dieValue == cube1 && !cube1Used)
+                    {
+                        cube1Used = true;
+                        usedCube = cube1;
+                    }
+                    else if (dieValue == cube2 && !cube2Used)
+                    {
+                        cube2Used = true;
+                        usedCube = cube2;
+                    }
+                    else if (dieValue < cube1 && !cube1Used)
+                    {
+                        cube1Used = true;
+                        usedCube = cube1;
+                    }
+                    else if (dieValue < cube2 && !cube2Used)
+                    {
+                        cube2Used = true;
+                        usedCube = cube2;
+                    }
                 }
 
                 // Remove the checker from the slot
@@ -1076,6 +1148,8 @@ namespace BackgammonClient.Forms
             {
                 // Game over, player has won
                 this.updatesLabel.Text = "Game Over! You have borne off all your checkers!";
+                MessageBox.Show("Game Over. you won");
+                sendMessage("Win," + this.color);
                 // Disable further moves
                 roll.Enabled = false;
                 doneButton.Enabled = false;
@@ -1285,6 +1359,32 @@ namespace BackgammonClient.Forms
                 if (discsButtons[i] != null && (int)this.discsButtons[i].Tag == this.color)
                 {
                     this.discsButtons[i].Enabled = true;
+                }
+            }
+        }
+
+        public void winHandling(int winner)
+        {
+            if (this.color == 1) 
+            {
+                if (winner == 1)
+                {
+                    MessageBox.Show("Game over. You won!");
+                }
+                else if (winner == 2)
+                {
+                    MessageBox.Show("Game over. Black won.");
+                }
+            }
+            else if (this.color == 2)
+            {
+                if (winner == 1)
+                {
+                    MessageBox.Show("Game over. White won.");
+                }
+                else if (winner == 2)
+                {
+                    MessageBox.Show("Game over. You won!");
                 }
             }
         }
@@ -1586,5 +1686,10 @@ namespace BackgammonClient.Forms
             // Update the display message
             this.updatesLabel.Text = "Board set up for bearing off. All checkers are in their home boards.";
         }
+    public void ShowMessageInMessageBox(string message)
+        {
+            MessageBox.Show(message);
+        }
+
     }
 }
