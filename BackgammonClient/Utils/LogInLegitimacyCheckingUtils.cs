@@ -134,7 +134,6 @@ namespace BackgammonClient.Utils
                     }
                 }
             }
-
             return ErrorMessage.Trim();
         }
     }

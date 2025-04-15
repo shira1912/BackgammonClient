@@ -65,6 +65,11 @@ namespace BackgammonClient
         private void signUp(string message)
         {
             _encryptedCommunication.SendMessage(message);
+            //_signUpWindow.BeginInvoke(() =>
+            //{
+            //   _signUpWindow.SendEmail();
+            //});
+
         }
 
         private void OnSwitchWindowToLogIn()
