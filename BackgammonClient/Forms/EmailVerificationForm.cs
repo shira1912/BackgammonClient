@@ -15,10 +15,11 @@ namespace BackgammonClient.Forms
         private string verificationCode;
         public event Action<string> sendMessage;
         private string userEmail;
-        public EmailVerificationForm(string code, string userEmail)
+        private string type;
+        public EmailVerificationForm(string type, string code, string userEmail)
         {
             InitializeComponent();
-            
+            this.type = type;
             this.verificationCode = code;
             this.userEmail = userEmail;
             Controls.Remove(resetPasswordPanel);
@@ -28,14 +29,38 @@ namespace BackgammonClient.Forms
         {
             if (userInput.Text == verificationCode)
             {
-               
+                if (type == "mail")
+                {
                     this.DialogResult = DialogResult.OK; // תוצאה מוצלחת
                     this.Close(); // סגירת החלון
+                }
+                else if(type == "password")
+                {
+                    Controls.Clear();
+                    Controls.Add(resetPasswordPanel);
+                }
             }
             else
             {
                 MessageBox.Show("try again");
                 userInput.Text = "";
+            }
+        }
+
+        private void ResetPasswordB_Click(object sender, EventArgs e)
+        {
+            if (newPass1.Text != newPass2.Text)
+            {
+                MessageBox.Show("Passwords are not the same");
+            }
+            else if (newPass1.Text.Length < 6)
+            {
+                MessageBox.Show("Password must be six or more characters long");
+            }
+            else
+            {
+                sendMessage("ResetPassword" + userEmail + "_" + newPass1.Text);
+                this.Close();
             }
         }
     }

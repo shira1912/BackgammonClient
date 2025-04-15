@@ -37,6 +37,9 @@
             SkipButton = new System.Windows.Forms.Button();
             checkBox = new System.Windows.Forms.CheckBox();
             label3 = new System.Windows.Forms.Label();
+            ForgotPassLinkL = new System.Windows.Forms.LinkLabel();
+            forgotPassEmailT = new System.Windows.Forms.TextBox();
+            sendFPEmailB = new System.Windows.Forms.Button();
             SuspendLayout();
             // 
             // UserNameTextBox
@@ -139,12 +142,47 @@
             label3.Text = "שש-בש";
             label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // ForgotPassLinkL
+            // 
+            ForgotPassLinkL.AutoSize = true;
+            ForgotPassLinkL.LinkColor = System.Drawing.Color.SaddleBrown;
+            ForgotPassLinkL.Location = new System.Drawing.Point(198, 185);
+            ForgotPassLinkL.Name = "ForgotPassLinkL";
+            ForgotPassLinkL.Size = new System.Drawing.Size(100, 15);
+            ForgotPassLinkL.TabIndex = 9;
+            ForgotPassLinkL.TabStop = true;
+            ForgotPassLinkL.Text = "Forgot Password?";
+            ForgotPassLinkL.LinkClicked += ForgotPassLinkL_LinkClicked;
+            // 
+            // forgotPassEmailT
+            // 
+            forgotPassEmailT.Location = new System.Drawing.Point(304, 182);
+            forgotPassEmailT.Name = "forgotPassEmailT";
+            forgotPassEmailT.Size = new System.Drawing.Size(100, 23);
+            forgotPassEmailT.TabIndex = 10;
+            // 
+            // sendFPEmailB
+            // 
+            sendFPEmailB.BackColor = System.Drawing.Color.SaddleBrown;
+            sendFPEmailB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            sendFPEmailB.ForeColor = System.Drawing.Color.Tan;
+            sendFPEmailB.Location = new System.Drawing.Point(410, 182);
+            sendFPEmailB.Name = "sendFPEmailB";
+            sendFPEmailB.Size = new System.Drawing.Size(49, 23);
+            sendFPEmailB.TabIndex = 11;
+            sendFPEmailB.Text = "send";
+            sendFPEmailB.UseVisualStyleBackColor = false;
+            sendFPEmailB.Click += sendFPEmailB_Click;
+            // 
             // LogInWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.Tan;
             ClientSize = new System.Drawing.Size(700, 422);
+            Controls.Add(sendFPEmailB);
+            Controls.Add(forgotPassEmailT);
+            Controls.Add(ForgotPassLinkL);
             Controls.Add(label3);
             Controls.Add(checkBox);
             Controls.Add(SkipButton);
@@ -172,6 +210,9 @@
         private System.Windows.Forms.Button SkipButton;
         private System.Windows.Forms.CheckBox checkBox;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.LinkLabel ForgotPassLinkL;
+        private System.Windows.Forms.TextBox forgotPassEmailT;
+        private System.Windows.Forms.Button sendFPEmailB;
     }
 }
 

@@ -95,7 +95,7 @@
             ResetPasswordB.TabIndex = 6;
             ResetPasswordB.Text = "Reset Password";
             ResetPasswordB.UseVisualStyleBackColor = true;
-            //ResetPasswordB.Click += ResetPasswordB_Click;
+            ResetPasswordB.Click += ResetPasswordB_Click;
             // 
             // newPass2
             // 

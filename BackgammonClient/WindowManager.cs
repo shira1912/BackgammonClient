@@ -176,6 +176,17 @@ namespace BackgammonClient
                         }));
                     }
                     break;
+                case "IsEmailExists":
+                    {
+                        if (splitMessage[1] == "true")
+                        {
+                            _logInWindow.BeginInvoke(() =>
+                            {
+                                _logInWindow.sendForgotPassEmail(splitMessage[1]);
+                            });
+                        }
+                        break;
+                    }
 
                 default:
                     {

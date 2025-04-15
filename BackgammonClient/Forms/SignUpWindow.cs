@@ -103,11 +103,12 @@ namespace BackgammonClient
             {
                 string code = new Random().Next(100000, 999999).ToString();
                 SendEmail(EmailTextBox.Text, "Email Verification", "Hello " + FirstNameTextBox.Text + "!\r\n\r\nTo complete your registration, please enter the following verification code:\r\n\r\n🔒 Your verification code: " + code + "\r\n\r\nIf you did not request this registration, you can safely ignore this email.\r\n\r\nThank you,  \r\nBackgammon Team");
-                EmailVerificationForm emailVerificationForm = new EmailVerificationForm(code, EmailTextBox.Text);
+                EmailVerificationForm emailVerificationForm = new EmailVerificationForm("mail", code, EmailTextBox.Text);
                 DialogResult emailVerificationResult = emailVerificationForm.ShowDialog();
 
                 if (emailVerificationResult == DialogResult.OK)
                 {
+                    MessageBox.Show("Email vertification was successful");
                     var input = $"{username},{password},{firstName},{lastName},{email},{city},{gender}";
                     OnSignUp?.Invoke("SignUp," + input);
                 }
