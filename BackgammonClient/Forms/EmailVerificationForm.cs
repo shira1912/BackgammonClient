@@ -59,7 +59,7 @@ namespace BackgammonClient.Forms
             }
             else
             {
-                sendMessage("ResetPassword" + userEmail + "_" + newPass1.Text);
+                sendMessage("ResetPassword," + userEmail + "," + newPass1.Text);
                 this.Close();
             }
         }

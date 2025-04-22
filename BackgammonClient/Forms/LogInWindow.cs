@@ -12,6 +12,8 @@ namespace BackgammonClient
         private LogInWindow _logInWindow;
         private WaitingRoomWindow _waitingRoomWindow;
         public event Action<string> OnLogIn;
+        public event Action<string> OnResetPassword;
+
         public event Action<string> OnCaptcha;
         public event Action<string> sendMessage;
 
@@ -104,14 +106,15 @@ namespace BackgammonClient
 
         private void sendFPEmailB_Click(object sender, EventArgs e)
         {
-            sendMessage("isEmailExists, " + forgotPassEmailT);
+            string email = forgotPassEmailT.Text;
+            OnResetPassword.Invoke("IsEmailExists, " + email);
         }
 
         public void sendForgotPassEmail(string emailGiven)
         {
             string code = new Random().Next(100000, 999999).ToString();
-            string emailBody = "Hello!\r\n\r\nWe received a request to reset the password for your CtrlAltBookIt account.\r\n\r\nTo proceed, please enter the following verification code:\r\n\r\n🔐 Verification Code: " + code + "\r\n\r\nThank you,\r\n\r\nBackgammon Team";
-            SendEmail(forgotPassEmailT.Text, "Reset Your CtrlAltBookIt Password", emailBody);
+            string emailBody = "Hello!\r\n\r\nWe received a request to reset the password for your account.\r\n\r\nTo proceed, please enter the following verification code:\r\n\r\n🔐 Verification Code: " + code + "\r\n\r\nThank you,\r\n\r\nBackgammon Team";
+            SendEmail(forgotPassEmailT.Text, "Reset Your Password", emailBody);
             EmailVerificationForm emailVerificationForm = new EmailVerificationForm("password", code, emailGiven);
         }
     }

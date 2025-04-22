@@ -32,6 +32,8 @@ namespace BackgammonClient
             _logInWindow.OnLogIn += sendMessage;
             _logInWindow.OnSwitchWindowToSignUp += OnSwitchWindowToSignUp;
 
+            _logInWindow.OnResetPassword += sendMessage;
+
 
             _signUpWindow.OnSignUp += signUp;
             _signUpWindow.OnSwitchWindowToLogIn += OnSwitchWindowToLogIn;
@@ -182,13 +184,34 @@ namespace BackgammonClient
                         {
                             _logInWindow.BeginInvoke(() =>
                             {
+                                _logInWindow.ShowMessageInMessageBox("An email is being sent to you.");
+
                                 _logInWindow.sendForgotPassEmail(splitMessage[1]);
+                            });
+                        }
+                        else
+                        {
+                            _logInWindow.BeginInvoke(() =>
+                            {
+                                _logInWindow.ShowMessageInMessageBox("Email doesn't exist in our system");
                             });
                         }
                         break;
                     }
 
-                default:
+                case "ResetPassword":
+                    {
+                        if (splitMessage[1] == "successful")
+                        {
+                            _logInWindow.BeginInvoke(() =>
+                            {
+                                _logInWindow.ShowMessageInMessageBox("Password has been reset successfully.");
+                            });
+                        }
+                        break;
+                    }
+
+                        default:
                     {
                         throw new System.Exception("Unknown message");
                     }
