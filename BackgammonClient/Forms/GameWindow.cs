@@ -85,6 +85,7 @@ namespace BackgammonClient.Forms
         public event Action OnSwitchTurn;
         // public event Action Onwin;
         public event Action<string> sendMessage;
+        public event Action OnSwitchWindowToWaitingRoom;
         private Color[] discsColor = [System.Drawing.SystemColors.ButtonHighlight, System.Drawing.SystemColors.ActiveCaptionText];
 
         private delegate void delSwitchTurn(bool turn);
@@ -1148,7 +1149,7 @@ namespace BackgammonClient.Forms
             {
                 // Game over, player has won
                 this.updatesLabel.Text = "Game Over! You have borne off all your checkers!";
-                MessageBox.Show("Game Over. you won");
+                //MessageBox.Show("Game Over. you won");
                 sendMessage("Win," + this.color);
                 // Disable further moves
                 roll.Enabled = false;
@@ -1365,7 +1366,7 @@ namespace BackgammonClient.Forms
 
         public void winHandling(int winner)
         {
-            if (this.color == 1) 
+            if (this.color == 1)
             {
                 if (winner == 1)
                 {
@@ -1387,6 +1388,7 @@ namespace BackgammonClient.Forms
                     MessageBox.Show("Game over. You won!");
                 }
             }
+            OnSwitchWindowToWaitingRoom?.Invoke();
         }
 
 
@@ -1686,10 +1688,14 @@ namespace BackgammonClient.Forms
             // Update the display message
             this.updatesLabel.Text = "Board set up for bearing off. All checkers are in their home boards.";
         }
-    public void ShowMessageInMessageBox(string message)
+        public void ShowMessageInMessageBox(string message)
         {
             MessageBox.Show(message);
         }
 
+        private void GameWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }

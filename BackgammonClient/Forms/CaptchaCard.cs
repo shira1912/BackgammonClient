@@ -12,20 +12,35 @@ namespace BackgammonClient.Forms
 {
     public partial class CaptchaCard : UserControl
     {
-        public CaptchaCard()
+        public CaptchaCard(bool timer)
         {
             InitializeComponent();
-            // יצירת קאפצ'ה
-            GenerateCaptcha();
-            tryCount = 0;
-            lblCountdown.Hide();
-            progressBar.Hide();
+            if (!timer)
+            {
+                // יצירת קאפצ'ה
+                GenerateCaptcha();
+                tryCount = 0;
+                lblCountdown.Hide();
+                progressBar.Hide();
+            }
+            else
+            {
+                timer = true;
+                tryCount = 4;
+                startTimer();
+                skipCaptcha.Hide();
+                checkButton.Hide();
+                userInputT.Hide();
+            }
+
+
         }
 
         private string captchaText;
         private int tryCount;
         private int countdownSeconds = 60;  // זמן ההתחלה - 60 שניות (דקה)
         public bool check = false;
+        private bool timer = false;
 
         private void GenerateCaptcha()
         {
@@ -74,22 +89,27 @@ namespace BackgammonClient.Forms
             else
             {
                 tryCount++;
-                if (tryCount > 3)
-                {
-                    MessageBox.Show("too many tries. try again later.");
-                    DisableInputs();
-                    countdownSeconds = 60;
-                    progressBar.Value = 0;  // אתחול של ה-ProgressBar ל-0
-                    progressBar.Maximum = 60;
-                    countdownTimer.Start();
-                    UpdateCountdownDisplay();  // עדכון תצוגת הזמן
-                }
-                else
-                {
-                    MessageBox.Show("are you a robot?");
-                    GenerateCaptcha(); // יצירת קאפצ'ה חדשה אחרי טעות
-                }
+                startTimer();
 
+            }
+        }
+
+        private void startTimer()
+        {
+            if (tryCount > 3 || timer)
+            {
+                MessageBox.Show("too many tries. try again later.");
+                DisableInputs();
+                countdownSeconds = 60;
+                progressBar.Value = 0;  // אתחול של ה-ProgressBar ל-0
+                progressBar.Maximum = 60;
+                countdownTimer.Start();
+                UpdateCountdownDisplay();  // עדכון תצוגת הזמן
+            }
+            else
+            {
+                MessageBox.Show("are you a robot?");
+                GenerateCaptcha(); // יצירת קאפצ'ה חדשה אחרי טעות
             }
         }
 
@@ -105,6 +125,10 @@ namespace BackgammonClient.Forms
                 EnableInputs();
                 tryCount = 0;
                 MessageBox.Show("you may try again");  // פעולה שמתבצעת בסיום
+                if (timer)
+                {
+                    this.Hide();
+                }
 
             }
         }
@@ -147,6 +171,12 @@ namespace BackgammonClient.Forms
             MessageBox.Show("good");
             check = true; // תוצאה מוצלחת
             this.Hide(); // סגירת החלון
+        }
+
+        private void CaptchaCard_Load(object sender, EventArgs e)
+        {
+            this.BringToFront();
+            
         }
     }
 }

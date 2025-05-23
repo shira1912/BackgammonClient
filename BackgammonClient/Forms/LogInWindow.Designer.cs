@@ -110,7 +110,7 @@
             SkipButton.BackColor = System.Drawing.Color.SaddleBrown;
             SkipButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             SkipButton.ForeColor = System.Drawing.Color.Tan;
-            SkipButton.Location = new System.Drawing.Point(583, 339);
+            SkipButton.Location = new System.Drawing.Point(573, 325);
             SkipButton.Name = "SkipButton";
             SkipButton.Size = new System.Drawing.Size(75, 23);
             SkipButton.TabIndex = 6;
@@ -194,6 +194,7 @@
             Controls.Add(UserNameTextBox);
             Name = "LogInWindow";
             Text = "LOG IN";
+            FormClosed += LogInWindow_FormClosed;
             Load += LogInWindow_Load;
             ResumeLayout(false);
             PerformLayout();

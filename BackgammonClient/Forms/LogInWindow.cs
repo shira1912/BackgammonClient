@@ -4,6 +4,8 @@ using System;
 using System.Net.Mail;
 using System.Net;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BackgammonClient
 {
@@ -11,23 +13,25 @@ namespace BackgammonClient
     {
         private LogInWindow _logInWindow;
         private WaitingRoomWindow _waitingRoomWindow;
-        public event Action<string> OnLogIn;
+        public event Action<string> sendMessage;
         public event Action<string> OnResetPassword;
 
         public event Action<string> OnCaptcha;
-        public event Action<string> sendMessage;
 
         public event Action OnSwitchWindowToSignUp;
-        private CaptchaCard captchaCard;
+        private CaptchaCard CaptchaCard;
+        private CaptchaCard TimerCard;
+        private int countTries = 0;
 
         public LogInWindow()
         {
             InitializeComponent();
-            captchaCard = new CaptchaCard();
+            CaptchaCard = new CaptchaCard(false);
             _waitingRoomWindow = new WaitingRoomWindow();
             forgotPassEmailT.Hide();
             sendFPEmailB.Hide();
-            captchaCard.Location = new System.Drawing.Point(0, 0);
+            CaptchaCard.Location = new System.Drawing.Point(196, 208);
+
         }
 
         public void ShowMessageInMessageBox(string message)
@@ -35,12 +39,27 @@ namespace BackgammonClient
             MessageBox.Show(message);
         }
 
+        public async void updateTries()
+        {
+            countTries++;
+
+            if (countTries > 3)
+            {
+                TimerCard = new CaptchaCard(true);
+                TimerCard.BringToFront();
+                TimerCard.Location = new System.Drawing.Point(196, 208);
+                Controls.Add(TimerCard);
+                await Task.Delay(60000);
+                Controls.Remove(TimerCard);
+            }
+        }
+
         private void LogInButton_Click(object sender, EventArgs e)
         {
             var username = UserNameTextBox.Text.Trim();
             var password = PasswordTextBox.Text.Trim();
 
-            var validationMessage = LogInLegitimacyCheckingUtils.IsUserNameAndPasswordLegitimate(username, password);
+            var validationMessage = LogInLegitimacyCheckingUtils.IsUserNameAndPasswordLegitimate(username, password, checkBox.Checked);
             if (!string.IsNullOrEmpty(validationMessage))
             {
                 MessageBox.Show(validationMessage);
@@ -48,7 +67,7 @@ namespace BackgammonClient
             }
 
             var input = $"{username},{password}";
-            OnLogIn?.Invoke("Login," + input);
+            sendMessage?.Invoke("Login," + input);
         }
 
 
@@ -64,14 +83,14 @@ namespace BackgammonClient
 
         private void SkipButton_Click(object sender, EventArgs e)
         {
-            OnLogIn?.Invoke("Login,alex1989,StrongP@ssw0rd");
+            sendMessage?.Invoke("Login,alex1989,StrongP@ssw0rd");
         }
 
         private void checkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox.Checked)
             {
-                Controls.Add(captchaCard);
+                Controls.Add(CaptchaCard);
                 checkBox.Enabled = false;
             }
 
@@ -107,7 +126,7 @@ namespace BackgammonClient
         private void sendFPEmailB_Click(object sender, EventArgs e)
         {
             string email = forgotPassEmailT.Text;
-            OnResetPassword.Invoke("IsEmailExists, " + email);
+            OnResetPassword.Invoke("IsEmailExists," + email);
         }
 
         public void sendForgotPassEmail(string emailGiven)
@@ -115,7 +134,14 @@ namespace BackgammonClient
             string code = new Random().Next(100000, 999999).ToString();
             string emailBody = "Hello!\r\n\r\nWe received a request to reset the password for your account.\r\n\r\nTo proceed, please enter the following verification code:\r\n\r\n🔐 Verification Code: " + code + "\r\n\r\nThank you,\r\n\r\nBackgammon Team";
             SendEmail(forgotPassEmailT.Text, "Reset Your Password", emailBody);
-            EmailVerificationForm emailVerificationForm = new EmailVerificationForm("password", code, emailGiven);
+            EmailVerificationForm emailVerificationForm = new EmailVerificationForm("password", code, forgotPassEmailT.Text);
+            emailVerificationForm.sendMessage += sendMessage;
+            emailVerificationForm.Show();
+        }
+
+        private void LogInWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

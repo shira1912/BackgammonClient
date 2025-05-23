@@ -94,6 +94,7 @@
             Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             Name = "WaitingRoomWindow";
             Text = "WAITING ROOM";
+            FormClosed += WaitingRoomWindow_FormClosed;
             ResumeLayout(false);
             PerformLayout();
         }

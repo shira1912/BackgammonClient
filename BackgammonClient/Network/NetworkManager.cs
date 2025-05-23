@@ -8,7 +8,7 @@ namespace LogInClient.Network
         public event Action<string> OnMessageReceive;
 
         private int m_PortNo = 5000;
-        private string m_IpAddress = "127.0.0.1";
+        private string m_IpAddress = "10.67.200.214";
         private TcpClient m_Client;
         private byte[] m_Data;
         private bool m_IsConnected = false;

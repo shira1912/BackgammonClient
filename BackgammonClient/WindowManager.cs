@@ -15,6 +15,7 @@ namespace BackgammonClient
         private WaitingRoomWindow _waitingRoomWindow;
         private GameWindow _GameWindow;
         private int playerId;
+        private int countTries = 0;
         private delegate void delWaitingLabel();
 
 
@@ -29,7 +30,7 @@ namespace BackgammonClient
 
             _encryptedCommunication.OnMessageReceive += OnMessageReceive;
 
-            _logInWindow.OnLogIn += sendMessage;
+            _logInWindow.sendMessage += sendMessage;
             _logInWindow.OnSwitchWindowToSignUp += OnSwitchWindowToSignUp;
 
             _logInWindow.OnResetPassword += sendMessage;
@@ -80,7 +81,13 @@ namespace BackgammonClient
             _logInWindow?.Show();
         }
 
-       
+        private void OnSwitchWindowToWaitingRoom()
+        {
+            _waitingRoomWindow = new WaitingRoomWindow();
+            _waitingRoomWindow.OnStartSearchingForGame += SearchForGame;
+            _GameWindow?.Hide();
+            _waitingRoomWindow?.Show();
+        }
 
         private void OnMessageReceive(string message)
         {
@@ -94,14 +101,22 @@ namespace BackgammonClient
                         {
                             _signUpWindow.BeginInvoke(() =>
                             {
-                                _waitingRoomWindow.Show();
+                                _logInWindow.Show();
                                 _signUpWindow.Hide();
                             });
                         }
                         else
                         {
-                            _signUpWindow.ShowMessageInMessageBox("SignUp wasn't successful");
+                            _signUpWindow.ShowMessageInMessageBox("SignUp wasn't successful, " + splitMessage[2]+ " is exist");
                         }
+                        break;
+                    }
+                case "ValidSignUp":
+                    {
+                        _signUpWindow.BeginInvoke(() =>
+                        {
+                            _signUpWindow.checkValidEmail();
+                        });
                         break;
                     }
                 case "Login":
@@ -117,6 +132,10 @@ namespace BackgammonClient
                         }
                         else
                         {
+                            _logInWindow.BeginInvoke(() =>
+                            {
+                                _logInWindow.updateTries();
+                            });
                             _signUpWindow.ShowMessageInMessageBox("Login wasn't successful");
                         }
                         break;
@@ -133,6 +152,7 @@ namespace BackgammonClient
                             _GameWindow = new GameWindow(this.playerId);
                             _GameWindow.OnSwitchTurn += SwitchTurn;
                             _GameWindow.sendMessage += sendMessage;
+                            _GameWindow.OnSwitchWindowToWaitingRoom += OnSwitchWindowToWaitingRoom;
                             _GameWindow.Show();
                         });
 
@@ -176,6 +196,7 @@ namespace BackgammonClient
                             this._GameWindow.winHandling(playerID);
                             
                         }));
+                        
                     }
                     break;
                 case "IsEmailExists":

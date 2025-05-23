@@ -34,5 +34,10 @@ namespace BackgammonClient.Forms
         {
             MessageBox.Show(message);
         }
+
+        private void WaitingRoomWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }

@@ -5,6 +5,8 @@ using System.Net.Mail;
 using System.Net;
 using System.Windows.Forms;
 using BackgammonClient.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BackgammonClient
 {
@@ -83,15 +85,16 @@ namespace BackgammonClient
 
         private void SignUpButton_Click(object sender, EventArgs e)
         {
-            var username = UserNameTextBox.Text.Trim();
-            var password = PasswordTextBox.Text.Trim();
-            var firstName = FirstNameTextBox.Text.Trim();
-            var lastName = LastNameTextBox.Text.Trim();
-            var email = EmailTextBox.Text.Trim();
-            var city = CityComboBox.Text.Trim();
-            var gender = GenderComboBox.Text.Trim();
+            //var username = UserNameTextBox.Text.Trim();
+            //var password = PasswordTextBox.Text.Trim();
+            //var firstName = FirstNameTextBox.Text.Trim();
+            //var lastName = LastNameTextBox.Text.Trim();
+            //var email = EmailTextBox.Text.Trim();
+            //var city = CityComboBox.Text.Trim();
+            //var gender = GenderComboBox.Text.Trim();
 
-            var validationMessage = LogInLegitimacyCheckingUtils.IsAllFieldsFull(username, password, firstName, lastName, email, city, gender);
+            var validationMessage = LogInLegitimacyCheckingUtils.IsAllFieldsFull(UserNameTextBox.Text, PasswordTextBox.Text, FirstNameTextBox.Text, LastNameTextBox.Text, EmailTextBox.Text, CityComboBox.Text, GenderComboBox.Text);
+            validationMessage += LogInLegitimacyCheckingUtils.IsUserNameAndPasswordLegitimate(UserNameTextBox.Text, PasswordTextBox.Text, true);
 
             if (!string.IsNullOrEmpty(validationMessage))
             {
@@ -101,21 +104,28 @@ namespace BackgammonClient
 
             else
             {
-                string code = new Random().Next(100000, 999999).ToString();
-                SendEmail(EmailTextBox.Text, "Email Verification", "Hello " + FirstNameTextBox.Text + "!\r\n\r\nTo complete your registration, please enter the following verification code:\r\n\r\n🔒 Your verification code: " + code + "\r\n\r\nIf you did not request this registration, you can safely ignore this email.\r\n\r\nThank you,  \r\nBackgammon Team");
-                EmailVerificationForm emailVerificationForm = new EmailVerificationForm("mail", code, EmailTextBox.Text);
-                DialogResult emailVerificationResult = emailVerificationForm.ShowDialog();
-
-                if (emailVerificationResult == DialogResult.OK)
-                {
-                    MessageBox.Show("Email vertification was successful");
-                    var input = $"{username},{password},{firstName},{lastName},{email},{city},{gender}";
-                    OnSignUp?.Invoke("SignUp," + input);
-                }
+                var input = $"{UserNameTextBox.Text},{PasswordTextBox.Text},{FirstNameTextBox.Text},{LastNameTextBox.Text},{EmailTextBox.Text},{CityComboBox.Text},{GenderComboBox.Text}";
+                OnSignUp?.Invoke("ValidSignUp," + input);
 
                 //var input = $"{username},{password},{firstName},{lastName},{email},{city},{gender}";
                 //OnSignUp?.Invoke("SignUp," + input);
             }
+        }
+
+        public void checkValidEmail()
+        {
+            string code = new Random().Next(100000, 999999).ToString();
+            SendEmail(EmailTextBox.Text, "Email Verification", "Hello " + FirstNameTextBox.Text + "!\r\n\r\nTo complete your registration, please enter the following verification code:\r\n\r\n🔒 Your verification code: " + code + "\r\n\r\nIf you did not request this registration, you can safely ignore this email.\r\n\r\nThank you,  \r\nBackgammon Team");
+            EmailVerificationForm emailVerificationForm = new EmailVerificationForm("mail", code, EmailTextBox.Text);
+            DialogResult emailVerificationResult = emailVerificationForm.ShowDialog();
+
+            if (emailVerificationResult == DialogResult.OK)
+            {
+                MessageBox.Show("Email vertification was successful");
+                var input = $"{UserNameTextBox.Text},{PasswordTextBox.Text},{FirstNameTextBox.Text},{LastNameTextBox.Text},{EmailTextBox.Text},{CityComboBox.Text},{GenderComboBox.Text}";
+                OnSignUp?.Invoke("SignUp," + input);
+            }
+
         }
 
         private void LogInButton_Click_1(object sender, EventArgs e)
@@ -132,6 +142,11 @@ namespace BackgammonClient
         private void SignUpWindow_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void SignUpWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

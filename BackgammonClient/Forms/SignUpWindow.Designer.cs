@@ -48,131 +48,123 @@
             // 
             // UserNameTextBox
             // 
-            UserNameTextBox.Location = new System.Drawing.Point(249, 42);
-            UserNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            UserNameTextBox.Location = new System.Drawing.Point(218, 32);
             UserNameTextBox.Name = "UserNameTextBox";
-            UserNameTextBox.Size = new System.Drawing.Size(300, 27);
+            UserNameTextBox.Size = new System.Drawing.Size(263, 23);
             UserNameTextBox.TabIndex = 0;
             // 
             // PasswordTextBox
             // 
-            PasswordTextBox.Location = new System.Drawing.Point(249, 91);
-            PasswordTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            PasswordTextBox.Location = new System.Drawing.Point(218, 68);
             PasswordTextBox.Name = "PasswordTextBox";
-            PasswordTextBox.Size = new System.Drawing.Size(300, 27);
+            PasswordTextBox.Size = new System.Drawing.Size(263, 23);
             PasswordTextBox.TabIndex = 1;
             // 
             // FirstNameTextBox
             // 
-            FirstNameTextBox.Location = new System.Drawing.Point(249, 146);
-            FirstNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            FirstNameTextBox.Location = new System.Drawing.Point(218, 110);
             FirstNameTextBox.Name = "FirstNameTextBox";
-            FirstNameTextBox.Size = new System.Drawing.Size(300, 27);
+            FirstNameTextBox.Size = new System.Drawing.Size(263, 23);
             FirstNameTextBox.TabIndex = 2;
             // 
             // LastNameTextBox
             // 
-            LastNameTextBox.Location = new System.Drawing.Point(249, 202);
-            LastNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            LastNameTextBox.Location = new System.Drawing.Point(218, 152);
             LastNameTextBox.Name = "LastNameTextBox";
-            LastNameTextBox.Size = new System.Drawing.Size(300, 27);
+            LastNameTextBox.Size = new System.Drawing.Size(263, 23);
             LastNameTextBox.TabIndex = 3;
             // 
             // EmailTextBox
             // 
-            EmailTextBox.Location = new System.Drawing.Point(249, 259);
-            EmailTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            EmailTextBox.Location = new System.Drawing.Point(218, 194);
             EmailTextBox.Name = "EmailTextBox";
-            EmailTextBox.Size = new System.Drawing.Size(300, 27);
+            EmailTextBox.Size = new System.Drawing.Size(263, 23);
             EmailTextBox.TabIndex = 4;
             // 
             // CityComboBox
             // 
             CityComboBox.FormattingEnabled = true;
-            CityComboBox.Location = new System.Drawing.Point(249, 318);
-            CityComboBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            CityComboBox.Location = new System.Drawing.Point(218, 238);
             CityComboBox.Name = "CityComboBox";
-            CityComboBox.Size = new System.Drawing.Size(300, 28);
+            CityComboBox.Size = new System.Drawing.Size(263, 23);
             CityComboBox.TabIndex = 5;
             // 
             // GenderComboBox
             // 
             GenderComboBox.FormattingEnabled = true;
-            GenderComboBox.Location = new System.Drawing.Point(249, 386);
-            GenderComboBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            GenderComboBox.Location = new System.Drawing.Point(218, 290);
             GenderComboBox.Name = "GenderComboBox";
-            GenderComboBox.Size = new System.Drawing.Size(300, 28);
+            GenderComboBox.Size = new System.Drawing.Size(263, 23);
             GenderComboBox.TabIndex = 6;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(159, 46);
+            label1.Location = new System.Drawing.Point(139, 34);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(77, 20);
+            label1.Size = new System.Drawing.Size(62, 15);
             label1.TabIndex = 7;
             label1.Text = "user name";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(159, 95);
+            label2.Location = new System.Drawing.Point(139, 71);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(72, 20);
+            label2.Size = new System.Drawing.Size(57, 15);
             label2.TabIndex = 8;
             label2.Text = "password";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(159, 150);
+            label3.Location = new System.Drawing.Point(139, 112);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(75, 20);
+            label3.Size = new System.Drawing.Size(60, 15);
             label3.TabIndex = 9;
             label3.Text = "first name";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(159, 206);
+            label4.Location = new System.Drawing.Point(139, 154);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(73, 20);
+            label4.Size = new System.Drawing.Size(58, 15);
             label4.TabIndex = 10;
             label4.Text = "last name";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(159, 262);
+            label5.Location = new System.Drawing.Point(139, 196);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(46, 20);
+            label5.Size = new System.Drawing.Size(36, 15);
             label5.TabIndex = 11;
             label5.Text = "email";
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(159, 321);
+            label6.Location = new System.Drawing.Point(139, 241);
             label6.Name = "label6";
-            label6.Size = new System.Drawing.Size(32, 20);
+            label6.Size = new System.Drawing.Size(26, 15);
             label6.TabIndex = 12;
             label6.Text = "city";
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(159, 390);
+            label7.Location = new System.Drawing.Point(139, 292);
             label7.Name = "label7";
-            label7.Size = new System.Drawing.Size(56, 20);
+            label7.Size = new System.Drawing.Size(44, 15);
             label7.TabIndex = 13;
             label7.Text = "gender";
             // 
             // SignUpButton
             // 
-            SignUpButton.Location = new System.Drawing.Point(249, 439);
-            SignUpButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            SignUpButton.Location = new System.Drawing.Point(218, 329);
             SignUpButton.Name = "SignUpButton";
-            SignUpButton.Size = new System.Drawing.Size(300, 38);
+            SignUpButton.Size = new System.Drawing.Size(262, 28);
             SignUpButton.TabIndex = 14;
             SignUpButton.Text = "Sign up";
             SignUpButton.UseVisualStyleBackColor = true;
@@ -180,10 +172,9 @@
             // 
             // LogInButton
             // 
-            LogInButton.Location = new System.Drawing.Point(249, 484);
-            LogInButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            LogInButton.Location = new System.Drawing.Point(218, 363);
             LogInButton.Name = "LogInButton";
-            LogInButton.Size = new System.Drawing.Size(300, 38);
+            LogInButton.Size = new System.Drawing.Size(262, 28);
             LogInButton.TabIndex = 15;
             LogInButton.Text = "Log in";
             LogInButton.UseVisualStyleBackColor = true;
@@ -191,9 +182,9 @@
             // 
             // SignUpWindow
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(800, 562);
+            ClientSize = new System.Drawing.Size(700, 422);
             Controls.Add(LogInButton);
             Controls.Add(SignUpButton);
             Controls.Add(label7);
@@ -210,9 +201,9 @@
             Controls.Add(FirstNameTextBox);
             Controls.Add(PasswordTextBox);
             Controls.Add(UserNameTextBox);
-            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             Name = "SignUpWindow";
             Text = "SignUpForm";
+            FormClosed += SignUpWindow_FormClosed;
             Load += SignUpWindow_Load;
             ResumeLayout(false);
             PerformLayout();

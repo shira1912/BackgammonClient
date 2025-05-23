@@ -10,8 +10,8 @@ namespace BackgammonClient.Utils
         private const char DOT_SYMBOL = '.';
         private const int k_MinimalNameLength = 2;
         private const int MIN_PASSWORD_LENGTH = 8;
-
-        public static string IsUserNameAndPasswordLegitimate(string username, string password)
+        private static char[] illegalChars = { '=', '&' };
+        public static string IsUserNameAndPasswordLegitimate(string username, string password, bool isRobot)
         {
             string ErrorMessage = "";
 
@@ -24,17 +24,24 @@ namespace BackgammonClient.Utils
                 ErrorMessage += $"Username must be at least {k_MinimalUsernameLength} characters long.\n";
             }
 
+            ErrorMessage += checkLegalPassword(password);
+
             if (string.IsNullOrEmpty(password))
             {
                 ErrorMessage += "Password cannot be empty.\n";
             }
-            else
+            
+            else 
             {
                 string passwordError = IsPasswordStrongEnough(password);
                 if (!string.IsNullOrEmpty(passwordError))
                 {
                     ErrorMessage += passwordError + "\n";
                 }
+            }
+            if (!isRobot)
+            {
+                ErrorMessage += "You must confirm you are not a robot.\n";
             }
 
             return ErrorMessage.Trim();
@@ -80,6 +87,8 @@ namespace BackgammonClient.Utils
         private static string IsPasswordStrongEnough(string password)
         {
             string ErrorMessage = "";
+
+            ErrorMessage += checkLegalPassword(password);
 
             if (password.Length < MIN_PASSWORD_LENGTH)
             {
@@ -136,5 +145,19 @@ namespace BackgammonClient.Utils
             }
             return ErrorMessage.Trim();
         }
+
+        public static string checkLegalPassword(string password)
+        {
+            string ErrorMessage = "";
+            for (int i = 0; i < illegalChars.Length; i++)
+            {
+                if (password.Contains(illegalChars[i]))
+                {
+                    ErrorMessage += "Password cannot contains the char " + illegalChars[i] + " .\n";
+                }
+            }
+            return ErrorMessage;
+        }
     }
+
 }

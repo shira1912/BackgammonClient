@@ -41,7 +41,7 @@
             // lblCountdown
             // 
             lblCountdown.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            lblCountdown.Location = new System.Drawing.Point(67, 66);
+            lblCountdown.Location = new System.Drawing.Point(80, 66);
             lblCountdown.Name = "lblCountdown";
             lblCountdown.Size = new System.Drawing.Size(115, 34);
             lblCountdown.TabIndex = 11;
@@ -50,28 +50,28 @@
             // 
             // captchaImageLabel
             // 
-            captchaImageLabel.Location = new System.Drawing.Point(16, 57);
+            captchaImageLabel.Location = new System.Drawing.Point(29, 57);
             captchaImageLabel.Name = "captchaImageLabel";
             captchaImageLabel.Size = new System.Drawing.Size(213, 57);
             captchaImageLabel.TabIndex = 10;
             // 
             // progressBar
             // 
-            progressBar.Location = new System.Drawing.Point(16, 57);
+            progressBar.Location = new System.Drawing.Point(29, 57);
             progressBar.Name = "progressBar";
             progressBar.Size = new System.Drawing.Size(213, 53);
             progressBar.TabIndex = 9;
             // 
             // userInputT
             // 
-            userInputT.Location = new System.Drawing.Point(35, 128);
+            userInputT.Location = new System.Drawing.Point(48, 128);
             userInputT.Name = "userInputT";
             userInputT.Size = new System.Drawing.Size(166, 23);
             userInputT.TabIndex = 8;
             // 
             // skipCaptcha
             // 
-            skipCaptcha.Location = new System.Drawing.Point(81, 186);
+            skipCaptcha.Location = new System.Drawing.Point(94, 186);
             skipCaptcha.Name = "skipCaptcha";
             skipCaptcha.Size = new System.Drawing.Size(75, 23);
             skipCaptcha.TabIndex = 7;
@@ -80,7 +80,7 @@
             // 
             // checkButton
             // 
-            checkButton.Location = new System.Drawing.Point(81, 157);
+            checkButton.Location = new System.Drawing.Point(94, 157);
             checkButton.Name = "checkButton";
             checkButton.Size = new System.Drawing.Size(75, 23);
             checkButton.TabIndex = 6;
@@ -104,7 +104,8 @@
             Controls.Add(skipCaptcha);
             Controls.Add(checkButton);
             Name = "CaptchaCard";
-            Size = new System.Drawing.Size(244, 238);
+            Size = new System.Drawing.Size(266, 238);
+            Load += CaptchaCard_Load;
             ResumeLayout(false);
             PerformLayout();
         }
